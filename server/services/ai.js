@@ -20,10 +20,12 @@ const groqHoroscope = new OpenAI({
 const generateReading = async (userData, cards) => {
 
     // --- CONSTRUCT PROMPT WITH ORDER BUMPS ---
-    // Support both camelCase (frontend) and snake_case (database)
     const activeBumps = userData.selected_bumps || userData.selectedBumps || [];
-    const hasLove = activeBumps.includes('love');
-    const hasExtra = cards.length >= 5;
+    console.log(`🤖 AI Reading requested. Bumps: ${JSON.stringify(activeBumps)}`);
+
+    // Check if "love" or "extra_cards" is present in ANY form (string or array item)
+    const hasLove = JSON.stringify(activeBumps).toLowerCase().includes('love');
+    const hasExtra = cards.length >= 5 || JSON.stringify(activeBumps).toLowerCase().includes('extra');
 
     const sectionsPrompt = `
       ## 🌌 Sinfonia das Esferas
