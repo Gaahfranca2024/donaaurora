@@ -61,18 +61,17 @@ const generateReading = async (userData, cards) => {
       ## ❤️ Alma Gêmea & Sinastria
       (Análise profunda da vida amorosa, conexões de vidas passadas e futuro romântico. Dê esperança mas seja realista.)
     `;
-    `;
 
     const prompt = `
       Você incorpora a consciência de uma ** Alta Sacerdotisa Ancestral **, guardiã dos segredos do universo e da psicologia humana profunda(Arquétipos Junguianos).
       
       ** DADOS DO CONSULENTE:**
-        - Nome: ${ userData.name }
-    - Nascimento: ${ userData.birth_date || userData.birthDate }
+        - Nome: ${userData.name}
+    - Nascimento: ${userData.birth_date || userData.birthDate}
     - A Questão Sagrada: "${userData.question}"
 
         ** AS LÂMINAS REVELADAS:**
-            ${ cards.map((c, i) => `${i + 1}ª Carta: ${c.name} (${c.meaning_up})`).join('\n      ') }
+            ${cards.map((c, i) => `${i + 1}ª Carta: ${c.name} (${c.meaning_up})`).join('\n      ')}
 
       ** SUA MISSÃO:**
         Forneça uma leitura ** EXTENSA, PROFUNDA e COMPLEXA **. 
@@ -81,7 +80,7 @@ const generateReading = async (userData, cards) => {
       - Use metáforas ricas, linguagem poética e mística.
       
       ** ESTRUTURA DA REVELAÇÃO(IMPORTANTE: Use exatamente estes cabeçalhos para separar as seções):**
-        ${ sectionsPrompt }
+        ${sectionsPrompt}
 
       ** GANCHO FINAL(IMPORTANTE):**
         Termine com um parágrafo separado começando com "⚠️" alertando sobre a inveja / bloqueio para o upsell.
@@ -115,7 +114,7 @@ const generateReading = async (userData, cards) => {
         // FORCE INJECTION: Guarantee Love Section if purchased
         if (hasLove && !aiContent.includes("Alma Gêmea") && !aiContent.includes("Sinastria") && !aiContent.includes("Love")) {
             console.log("⚠️ AI esqueceu a seção de Amor. Injetando manualmente.");
-            aiContent += `\n\n## ❤️ Alma Gêmea & Sinastria\nAs cartas revelam uma vibração intensa na sua casa dos relacionamentos.A energia de ${ cards[0]?.name } sugere que conexões cármicas estão ativas.Se você está em um relacionamento, é hora de aprofundar o vínculo espiritual.Se está solteira(o), um encontro marcado pelo destino se aproxima.Abra seu coração, pois o universo está conspirando a seu favor no amor.`;
+            aiContent += `\n\n## ❤️ Alma Gêmea & Sinastria\nAs cartas revelam uma vibração intensa na sua casa dos relacionamentos.A energia de ${cards[0]?.name} sugere que conexões cármicas estão ativas.Se você está em um relacionamento, é hora de aprofundar o vínculo espiritual.Se está solteira(o), um encontro marcado pelo destino se aproxima.Abra seu coração, pois o universo está conspirando a seu favor no amor.`;
         }
 
         return aiContent;
@@ -144,25 +143,25 @@ const generateReading = async (userData, cards) => {
             // inserting the specific card name to ensure consistency.
 
             let mockReading = `## 🌌 Sinfonia das Esferas(Simulação da Energia)
-As estrelas dançam em uma configuração rara.A carta ** ${ cards[0]?.name }** que abre seu jogo revela que o número 7 rege seu momento, indicando uma busca profunda por verdade.O cosmos sussurra que ciclos antigos estão se fechando.
+As estrelas dançam em uma configuração rara.A carta ** ${cards[0]?.name}** que abre seu jogo revela que o número 7 rege seu momento, indicando uma busca profunda por verdade.O cosmos sussurra que ciclos antigos estão se fechando.
 
-## 🌱 A Raiz(Passado) - ${ cards[0]?.name }
-A presença de ** ${ cards[0]?.name }** no seu passado indica que houve uma fundação sólida, mas solitária.Você percorreu um caminho de autodescoberta.Esta lâmina sugere que o que você viveu recentemente serviu para forjar seu caráter e preparar seu espírito para a ascensão que virá.As cicatrizes que você carrega não são marcas de derrota, mas medalhas de uma guerra silenciosa que você venceu.
+## 🌱 A Raiz(Passado) - ${cards[0]?.name}
+A presença de ** ${cards[0]?.name}** no seu passado indica que houve uma fundação sólida, mas solitária.Você percorreu um caminho de autodescoberta.Esta lâmina sugere que o que você viveu recentemente serviu para forjar seu caráter e preparar seu espírito para a ascensão que virá.As cicatrizes que você carrega não são marcas de derrota, mas medalhas de uma guerra silenciosa que você venceu.
 
-## 🌫️ O Véu(Presente) - ${ cards[1]?.name }
-No presente, ** ${ cards[1]?.name }** surge como um aviso e uma benção.Esta energia mostra que você está em um momento de transição crucial.Pode haver uma tensão entre o que você deseja(o ideal) e o que a realidade apresenta(o real).O universo pede paciência e estratégia.Não force portas que ainda estão trancadas; a chave está em sua mão, basta girá - la com sabedoria, não com força.
+## 🌫️ O Véu(Presente) - ${cards[1]?.name}
+No presente, ** ${cards[1]?.name}** surge como um aviso e uma benção.Esta energia mostra que você está em um momento de transição crucial.Pode haver uma tensão entre o que você deseja(o ideal) e o que a realidade apresenta(o real).O universo pede paciência e estratégia.Não force portas que ainda estão trancadas; a chave está em sua mão, basta girá - la com sabedoria, não com força.
 
-## 🌅 O Horizonte(Futuro) - ${ cards[2]?.name }
-O futuro se ilumina com a chegada de ** ${ cards[2]?.name }**.Esta é uma carta de poder e resultado.Ela promete que, se você mantiver sua integridade e foco, a colheita será abundante.O destino reserva uma tranquilidade doce e uma vitória sobre os obstáculos atuais.Onde havia dúvida, a energia desta carta trará certeza.Confie no processo.`;
+## 🌅 O Horizonte(Futuro) - ${cards[2]?.name}
+O futuro se ilumina com a chegada de ** ${cards[2]?.name}**.Esta é uma carta de poder e resultado.Ela promete que, se você mantiver sua integridade e foco, a colheita será abundante.O destino reserva uma tranquilidade doce e uma vitória sobre os obstáculos atuais.Onde havia dúvida, a energia desta carta trará certeza.Confie no processo.`;
 
             if (hasExtra && cards[3] && cards[4]) {
                 mockReading += `
 
-## 🌑 O Inconsciente - ${ cards[3]?.name }
-Nas profundezas, ** ${ cards[3]?.name }** revela desejos ou medos que você não admite em voz alta.Há um potencial criativo imenso aqui esperando para ser desbloqueado assim que você perder o medo de brilhar.
+## 🌑 O Inconsciente - ${cards[3]?.name}
+Nas profundezas, ** ${cards[3]?.name}** revela desejos ou medos que você não admite em voz alta.Há um potencial criativo imenso aqui esperando para ser desbloqueado assim que você perder o medo de brilhar.
 
-## 🕊️ A Benção Final - ${ cards[4]?.name }
-Como conselho final, ** ${ cards[4]?.name }** traz a confirmação.O ciclo se completa de forma magistral.O universo está alinhado com seu propósito maior.`;
+## 🕊️ A Benção Final - ${cards[4]?.name}
+Como conselho final, ** ${cards[4]?.name}** traz a confirmação.O ciclo se completa de forma magistral.O universo está alinhado com seu propósito maior.`;
             }
 
             mockReading += `
@@ -171,7 +170,7 @@ Como conselho final, ** ${ cards[4]?.name }** traz a confirmação.O ciclo se co
 Sua intuição tem gritado com você, mas a lógica tem abafado essa voz.Existe um talento ou um sonho que você guardou na gaveta.O oráculo diz: é hora de abrir essa gaveta.
 
 ## 🕯️ Ritual Sugerido
-Em uma noite de lua clara, acenda uma vela azul.Escreva em um papel o desejo ligado à carta ${ cards[2]?.name }. Queime o papel e sopre as cinzas ao vento.`;
+Em uma noite de lua clara, acenda uma vela azul.Escreva em um papel o desejo ligado à carta ${cards[2]?.name}. Queime o papel e sopre as cinzas ao vento.`;
 
             if (hasLove) {
                 mockReading += `
@@ -183,7 +182,7 @@ As cartas do amor revelam uma conexão de chama gêmea próxima.Se você já tem
             mockReading += `
 
 ## ⚠️ GANCHO FINAL
-Apesar da luz positiva de ** ${ cards[2]?.name }** no futuro, sinto uma ** densidade pegajosa ** tentando bloquear sua ascensão.Há uma energia de inveja antiga, talvez de alguém que sorri para você mas não torce por você.Essa vibração baixa está tentando impedir que a promessa das cartas se concretize plenamente na sua vida financeira.`;
+Apesar da luz positiva de ** ${cards[2]?.name}** no futuro, sinto uma ** densidade pegajosa ** tentando bloquear sua ascensão.Há uma energia de inveja antiga, talvez de alguém que sorri para você mas não torce por você.Essa vibração baixa está tentando impedir que a promessa das cartas se concretize plenamente na sua vida financeira.`;
 
             return mockReading;
         }
@@ -200,18 +199,18 @@ const generateAstralAnalysis = async (profileName, chartData) => {
     // Construct readable context for AI
     const planetSummary = Object.entries(planets).map(([name, data]) => {
         const signIndex = Math.floor(data.lon / 30);
-        return `${ name } em ${ SIGNS[signIndex] } (Grau ${ (data.lon % 30).toFixed(1) })`;
+        return `${name} em ${SIGNS[signIndex]} (Grau ${(data.lon % 30).toFixed(1)})`;
     }).join(', ');
 
-    const aspectSummary = aspects.map(a => `${ a.p1 } ${ a.type } ${ a.p2 } `).join(', ');
+    const aspectSummary = aspects.map(a => `${a.p1} ${a.type} ${a.p2} `).join(', ');
 
     const prompt = `
       Você é um Oráculo Ancestral e Psicanalista de Almas.
       
       ** DADOS DO MAPA ASTRAL:**
-        - Ascendente: ${ ascendant.toFixed(2) }°
-    - Planetas: ${ planetSummary }
-    - Aspectos Principais: ${ aspectSummary }
+        - Ascendente: ${ascendant.toFixed(2)}°
+    - Planetas: ${planetSummary}
+    - Aspectos Principais: ${aspectSummary}
       
       ** OBJETIVO DA LEITURA:**
         Criar uma narrativa ** FLUIDA, POÉTICA E PSICOLÓGICA **.
@@ -263,46 +262,46 @@ const generateAstralAnalysis = async (profileName, chartData) => {
         // 1. Remove markdown code blocks
         cleanedContent = cleanedContent.replace(/```json / g, "").replace(/```/g, "");
 
-// 2. Find the actual JSON object by locating first '{' and last '}'
-const firstBrace = cleanedContent.indexOf('{');
-const lastBrace = cleanedContent.lastIndexOf('}');
+        // 2. Find the actual JSON object by locating first '{' and last '}'
+        const firstBrace = cleanedContent.indexOf('{');
+        const lastBrace = cleanedContent.lastIndexOf('}');
 
-if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    cleanedContent = cleanedContent.substring(firstBrace, lastBrace + 1);
-}
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            cleanedContent = cleanedContent.substring(firstBrace, lastBrace + 1);
+        }
 
-console.log("CLEANED JSON:", cleanedContent); // DEBUG
+        console.log("CLEANED JSON:", cleanedContent); // DEBUG
 
-try {
-    const parsed = JSON.parse(cleanedContent);
-    console.log("PARSED SUCCESS:", Object.keys(parsed)); // DEBUG
-    return parsed;
-} catch (jsonErr) {
-    console.error("Falha ao parsear JSON da IA:", jsonErr.message);
-    console.error("CONTEÚDO QUE FALHOU:", cleanedContent);
-    return {
-        trinity: "As estrelas revelam uma base sólida.",
-        personal: "Sua mente busca clareza.",
-        social: "Foco em crescimento pessoal.",
-        houses: "Áreas de vida em expansão.",
-        aspects: "Desafios trazem evolução.",
-        evolutionary: "Caminho de transformação.",
-        synthesis: "Seu destino está em suas mãos."
-    };
-}
+        try {
+            const parsed = JSON.parse(cleanedContent);
+            console.log("PARSED SUCCESS:", Object.keys(parsed)); // DEBUG
+            return parsed;
+        } catch (jsonErr) {
+            console.error("Falha ao parsear JSON da IA:", jsonErr.message);
+            console.error("CONTEÚDO QUE FALHOU:", cleanedContent);
+            return {
+                trinity: "As estrelas revelam uma base sólida.",
+                personal: "Sua mente busca clareza.",
+                social: "Foco em crescimento pessoal.",
+                houses: "Áreas de vida em expansão.",
+                aspects: "Desafios trazem evolução.",
+                evolutionary: "Caminho de transformação.",
+                synthesis: "Seu destino está em suas mãos."
+            };
+        }
 
     } catch (error) {
-    console.error("Erro na IA do Horóscopo:", error.message);
-    return {
-        trinity: "As estrelas revelam uma base sólida.",
-        personal: "Sua mente busca clareza.",
-        social: "Foco em crescimento pessoal.",
-        houses: "Áreas de vida em expansão.",
-        aspects: "Desafios trazem evolução.",
-        evolutionary: "Caminho de transformação.",
-        synthesis: "Seu destino está em suas mãos."
-    };
-}
+        console.error("Erro na IA do Horóscopo:", error.message);
+        return {
+            trinity: "As estrelas revelam uma base sólida.",
+            personal: "Sua mente busca clareza.",
+            social: "Foco em crescimento pessoal.",
+            houses: "Áreas de vida em expansão.",
+            aspects: "Desafios trazem evolução.",
+            evolutionary: "Caminho de transformação.",
+            synthesis: "Seu destino está em suas mãos."
+        };
+    }
 };
 
 module.exports = { generateReading, generateAstralAnalysis };
