@@ -205,12 +205,14 @@ As cartas indicam uma inveja velada vinda de alguém próximo ao seu círculo de
 
                             lines.forEach(line => {
                                 const trimmed = line.trim();
-                                // Detect if line is a header (starts with # or bounded by **)
-                                const isHeader = trimmed.startsWith('#') || (trimmed.startsWith('**') && (trimmed.endsWith('**') || trimmed.length < 50));
+                                // Header Detection: # or **Header** or **Header: 
+                                const isHeader = trimmed.startsWith('#') ||
+                                    (trimmed.startsWith('**') && (trimmed.endsWith('**') || trimmed.includes('**:') || trimmed.length < 50));
 
                                 if (isHeader) {
                                     if (currentSection) finalSections.push(currentSection);
-                                    currentSection = { title: trimmed.replace(/[#*:]/g, '').trim(), content: [] };
+                                    const cleanTitle = trimmed.replace(/[#*]/g, '').replace(/:$/, '').trim();
+                                    currentSection = { title: cleanTitle, content: [] };
                                 } else {
                                     if (currentSection) {
                                         currentSection.content.push(trimmed);

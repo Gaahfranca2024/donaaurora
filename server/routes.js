@@ -47,23 +47,35 @@ router.get('/payment/status/:email', async (req, res) => {
     }
 });
 
+// --- WEBHOOK QUEUE TO PREVENT RACE CONDITIONS ---
+const webhookQueue = new Map();
+
 router.post('/webhooks/cakto', async (req, res) => {
     // Kakto sends a POST with payment info
-    console.log("🔔 CAKTO WEBHOOK RECEIVED:", req.body);
+    const { event, data } = req.body;
+    const email = data?.customer?.email || req.body.customer_email || data?.customerEmail;
 
-    try {
-        const { event, data } = req.body;
-        console.log(`📡 Kakto Event: ${event} | Status: ${data?.status || req.body.status}`);
+    if (!email) {
+        console.log("⚠️ Webhook received without email. Ignoring.");
+        return res.sendStatus(200);
+    }
 
-        // Corrected events for Kakto
-        if (event === 'purchase_approved' || event === 'payment.paid' || data?.status === 'paid' || req.body.status === 'paid') {
-            const email = data?.customer?.email || req.body.customer_email || data?.customerEmail;
+    // Initialize or get the queue for this email
+    if (!webhookQueue.has(email)) {
+        webhookQueue.set(email, Promise.resolve());
+    }
 
-            if (email) {
+    // Add this webhook processing to the queue
+    webhookQueue.set(email, webhookQueue.get(email).then(async () => {
+        try {
+            console.log(`🔔 PROCESSING WEBHOOK for ${email} (${event})`);
+
+            // Corrected events for Kakto
+            if (event === 'purchase_approved' || event === 'payment.paid' || data?.status === 'paid' || req.body.status === 'paid') {
                 const productName = data?.product?.name || data?.offer?.name || "";
-                console.log(`💰 Payment confirmed for ${email}. Product: "${productName}"`);
+                console.log(`💰 Payment confirmed. Product: "${productName}"`);
 
-                // --- DETECT ORDER BUMPS BY KEYWORD (ULTRA-ROBUSTO) ---
+                // --- DETECT ORDER BUMPS BY KEYWORD ---
                 const selectedBumps = [];
                 const bodyStr = JSON.stringify(req.body).toLowerCase();
 
@@ -74,7 +86,7 @@ router.post('/webhooks/cakto', async (req, res) => {
                     selectedBumps.push('love');
                 }
 
-                console.log(`📦 Bumps detected in THIS event: ${selectedBumps.join(', ')}`);
+                console.log(`📦 Bumps detected: ${selectedBumps.join(', ')}`);
 
                 // 1. Get current lead to merge bumps
                 const { data: currentLead } = await require('./services/supabase').supabase
@@ -85,7 +97,8 @@ router.post('/webhooks/cakto', async (req, res) => {
                     .limit(1)
                     .single();
 
-                const finalBumps = Array.from(new Set([...(currentLead?.selected_bumps || []), ...selectedBumps]));
+                const existingBumps = Array.isArray(currentLead?.selected_bumps) ? currentLead.selected_bumps : [];
+                const finalBumps = Array.from(new Set([...existingBumps, ...selectedBumps]));
 
                 await require('./services/supabase').supabase
                     .from('leads')
@@ -97,13 +110,12 @@ router.post('/webhooks/cakto', async (req, res) => {
 
                 console.log(`✅ Supabase updated for ${email}. Final bumps: ${finalBumps.join(', ')}`);
             }
+        } catch (error) {
+            console.error(`❌ Webhook individual error for ${email}:`, error);
         }
+    }));
 
-        res.sendStatus(200);
-    } catch (error) {
-        console.error("Cakto Webhook Error:", error);
-        res.sendStatus(500);
-    }
+    res.sendStatus(200);
 });
 
 router.post('/webhook', async (req, res) => {
