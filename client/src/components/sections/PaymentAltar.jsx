@@ -52,8 +52,14 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
 
     const handleCreatePayment = () => {
         setLoadingPayment(true);
+        // Prefill email and name for better conversion and less errors on Kakto
+        const email = encodeURIComponent(userData.email || '');
+        const name = encodeURIComponent(userData.name || '');
+        const checkoutUrl = `https://pay.cakto.com.br/rkysko4_697498?email=${email}&name=${name}`;
+
+        console.log("🚀 Redirecionando para check-out Kakto:", checkoutUrl);
         // Abrir link da Cakto em nova aba
-        window.open('https://pay.cakto.com.br/rkysko4_697498', '_blank');
+        window.open(checkoutUrl, '_blank');
     };
 
     const copyToClipboard = () => {
