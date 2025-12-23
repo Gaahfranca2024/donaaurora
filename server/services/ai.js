@@ -260,7 +260,7 @@ const generateAstralAnalysis = async (profileName, chartData) => {
         let cleanedContent = rawContent;
 
         // 1. Remove markdown code blocks
-        cleanedContent = cleanedContent.replace(/```json / g, "").replace(/```/g, "");
+        cleanedContent = cleanedContent.replace(/```json/g, "").replace(/```/g, "");
 
         // 2. Find the actual JSON object by locating first '{' and last '}'
         const firstBrace = cleanedContent.indexOf('{');
