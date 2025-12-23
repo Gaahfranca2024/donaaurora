@@ -20,7 +20,9 @@ const groqHoroscope = new OpenAI({
 const generateReading = async (userData, cards) => {
 
     // --- CONSTRUCT PROMPT WITH ORDER BUMPS ---
-    const hasLove = userData.selectedBumps?.includes('love');
+    // Support both camelCase (frontend) and snake_case (database)
+    const activeBumps = userData.selected_bumps || userData.selectedBumps || [];
+    const hasLove = activeBumps.includes('love');
     const hasExtra = cards.length >= 5;
 
     const sectionsPrompt = `
@@ -61,7 +63,7 @@ const generateReading = async (userData, cards) => {
       
       **DADOS DO CONSULENTE:**
       - Nome: ${userData.name}
-      - Nascimento: ${userData.birthDate}
+      - Nascimento: ${userData.birth_date || userData.birthDate}
       - A Questão Sagrada: "${userData.question}"
       
       **AS LÂMINAS REVELADAS:**
