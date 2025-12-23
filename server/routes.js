@@ -53,26 +53,28 @@ router.post('/webhooks/cakto', async (req, res) => {
 
     try {
         const { event, data } = req.body;
+        console.log(`📡 Kakto Event: ${event} | Status: ${data?.status || req.body.status}`);
 
-        // Corrected events for Kakto (using 'purchase_approved' as seen in logs)
+        // Corrected events for Kakto
         if (event === 'purchase_approved' || event === 'payment.paid' || data?.status === 'paid' || req.body.status === 'paid') {
-            const email = data?.customer?.email || req.body.customer_email;
+            const email = data?.customer?.email || req.body.customer_email || data?.customerEmail;
 
             if (email) {
-                console.log(`💰 Payment confirmed for ${email}. Detecting bumps...`);
+                const productName = data?.product?.name || data?.offer?.name || "";
+                console.log(`💰 Payment confirmed for ${email}. Product: "${productName}"`);
 
-                // --- DETECT ORDER BUMPS BY NAME (MODO ROBUSTO) ---
+                // --- DETECT ORDER BUMPS BY KEYWORD (ULTRA-ROBUSTO) ---
                 const selectedBumps = [];
                 const bodyStr = JSON.stringify(req.body).toLowerCase();
 
-                if (bodyStr.includes('leitura aprofundada') || bodyStr.includes('2 cartas')) {
+                if (bodyStr.includes('carta') || bodyStr.includes('extra') || bodyStr.includes('aprofundada')) {
                     selectedBumps.push('extra_cards');
                 }
-                if (bodyStr.includes('compatibilidade amorosa') || bodyStr.includes('analise de amor')) {
+                if (bodyStr.includes('amor') || bodyStr.includes('compatibilidade') || bodyStr.includes('sinastria')) {
                     selectedBumps.push('love');
                 }
 
-                console.log(`📦 Bumps detected in this event: ${selectedBumps.join(', ')}`);
+                console.log(`📦 Bumps detected in THIS event: ${selectedBumps.join(', ')}`);
 
                 // 1. Get current lead to merge bumps
                 const { data: currentLead } = await require('./services/supabase').supabase
@@ -91,7 +93,7 @@ router.post('/webhooks/cakto', async (req, res) => {
                         status: 'paid',
                         selected_bumps: finalBumps
                     })
-                    .eq('email', email); // Remove status check so late bumps work
+                    .eq('email', email);
 
                 console.log(`✅ Supabase updated for ${email}. Final bumps: ${finalBumps.join(', ')}`);
             }
