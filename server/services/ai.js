@@ -239,11 +239,11 @@ const generateAstralAnalysis = async (profileName, chartData) => {
         console.log("Contexto:", planetSummary);
         const completion = await groqHoroscope.chat.completions.create({
             messages: [
-                { role: "system", content: "Você é um Oráculo Ancestral. Você fala APENAS em prosa poética. Você odeia listas. Você odeia palavras soltas. Você escreve parágrafos completos, gramaticalmente perfeitos e emocionantes. Se você estiver inseguro sobre o que escrever, escreva um poema sobre as estrelas." },
+                { role: "system", content: "Você é um Oráculo Ancestral. Você fala APENAS em prosa poética e psicológica. Você NUNCA usa listas ou tópicos. IMPORTANTE: Você deve retornar um JSON VÁLIDO seguindo estritamente a estrutura solicitada. Certifique-se de colocar vírgulas entre os campos do JSON." },
                 { role: "user", content: prompt }
             ],
             model: "llama-3.1-8b-instant",
-            temperature: 0.75, // Slightly higher for creativity
+            temperature: 0.5, // Lowered even more for the smaller model to prioritize structure
             max_tokens: 4096,
             response_format: { type: "json_object" }
         }).catch(err => {

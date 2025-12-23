@@ -463,27 +463,44 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
 
                                             {/* Body */}
                                             <div className="p-8 space-y-6">
-                                                <div className="space-y-4 text-center">
-                                                    <p className="text-gray-300 leading-relaxed">
-                                                        Os astros revelaram <span className="text-amber-200 font-bold">7 pontos cruciais</span> sobre seu futuro financeiro e amoroso. O mapa foi gerado com sucesso e está aguardando liberação.
-                                                    </p>
+                                                {!paymentData ? (
+                                                    <>
+                                                        <div className="space-y-4 text-center">
+                                                            <p className="text-gray-300 leading-relaxed">
+                                                                Os astros revelaram <span className="text-amber-200 font-bold">7 pontos cruciais</span> sobre seu futuro financeiro e amoroso. O mapa foi gerado com sucesso e está aguardando liberação.
+                                                            </p>
 
-                                                    <div className="bg-black/40 rounded-xl p-4 border border-white/5 flex items-center justify-between">
-                                                        <span className="text-gray-400 text-sm">Taxa de Operação</span>
-                                                        <span className="text-amber-400 font-mono font-bold text-lg">R$ 19,90</span>
+                                                            <div className="bg-black/40 rounded-xl p-4 border border-white/5 flex items-center justify-between">
+                                                                <span className="text-gray-400 text-sm">Taxa de Operação</span>
+                                                                <span className="text-amber-400 font-mono font-bold text-lg">R$ 19,90</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={handleGeneratePix}
+                                                            className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-700 hover:from-amber-400 hover:to-amber-600 text-black shadow-[0_0_20px_rgba(245,158,11,0.3)] rounded-xl font-bold text-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 group"
+                                                        >
+                                                            <Zap className="text-black fill-black group-hover:animate-pulse" size={20} />
+                                                            <span>Liberar Mapa Completo</span>
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center py-4">
+                                                        <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mx-auto mb-6"></div>
+                                                        <h4 className="text-xl font-serif text-amber-100 mb-2">Aguardando Pagamento</h4>
+                                                        <p className="text-gray-400 text-sm mb-6">Conclua o pagamento na aba aberta para liberar seu mapa.</p>
+
+                                                        <button
+                                                            onClick={() => setPaymentData(null)}
+                                                            className="text-amber-500/50 text-[10px] uppercase tracking-tighter hover:text-amber-500"
+                                                        >
+                                                            Voltar ou Trocar Forma
+                                                        </button>
                                                     </div>
-                                                </div>
-
-                                                <button
-                                                    onClick={handleGatePaymentSuccess}
-                                                    className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-green-900/50 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 group"
-                                                >
-                                                    <Zap className="text-yellow-300 fill-yellow-300 group-hover:animate-pulse" size={20} />
-                                                    <span>Liberar Acesso Agora</span>
-                                                </button>
+                                                )}
 
                                                 <p className="text-center text-[10px] text-gray-600">
-                                                    Ambiente criptografado. Acesso imediato após confirmação.
+                                                    Ambiente criptografado. Acesso imediato após confirmação via PIX.
                                                 </p>
                                             </div>
                                         </motion.div>

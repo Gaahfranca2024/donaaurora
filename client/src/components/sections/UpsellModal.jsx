@@ -140,22 +140,29 @@ const UpsellModal = ({ isOpen, onClose, onPurchaseSuccess, userData }) => {
 
                     {/* --- PAYMENT STATE --- */}
                     {viewState === 'payment' && (
-                        <div className="p-8 text-center">
-                            <h3 className="text-2xl font-serif text-gold mb-4">Pagamento Seguro</h3>
-                            <p className="text-sm text-mist mb-6">Escaneie para liberar o Ritual de Proteção</p>
-
-                            <div className="bg-white p-2 rounded-lg w-48 h-48 mx-auto mb-4">
-                                <img src={`data:image/png;base64,${paymentData?.qr_code_base64}`} className="w-full h-full object-contain" />
+                        <div className="p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
+                            <div className="mb-8">
+                                <div className="w-20 h-20 border-4 border-gold/20 border-t-gold rounded-full animate-spin mx-auto"></div>
                             </div>
 
-                            <button onClick={copyPix} className="text-gold font-bold underline mb-8">
-                                {copySuccess ? 'Copiado!' : 'Copiar Código Pix'}
-                            </button>
+                            <h3 className="text-2xl font-serif text-gold mb-4">Aguardando Pagamento...</h3>
+                            <p className="text-sm text-mist mb-8 max-w-xs mx-auto">
+                                Detectamos que você abriu a página de checkout. Assim que o pagamento for confirmado, esta tela será liberada automaticamente.
+                            </p>
+
+                            <div className="space-y-4 w-full">
+                                <button
+                                    onClick={() => window.open(`https://pay.cakto.com.br/w4s82ha_697659?email=${encodeURIComponent(userData.email)}&name=${encodeURIComponent(userData.name)}`, '_blank')}
+                                    className="text-gold/60 text-xs hover:text-gold transition-colors underline"
+                                >
+                                    Não abriu? Clique aqui para tentar novamente
+                                </button>
+                            </div>
 
                             {/* Debug Sim */}
-                            <div className="mt-2 text-center">
-                                <button onClick={() => { setViewState('success'); setTimeout(onPurchaseSuccess, 1000); }} className="text-[10px] text-white/20 hover:text-white/50">
-                                    (Debug: Simular Aprovação)
+                            <div className="mt-8 text-center opacity-20 hover:opacity-100 transition-opacity">
+                                <button onClick={() => { setViewState('success'); setTimeout(() => onPurchaseSuccess(), 1000); }} className="text-[10px] text-white/50">
+                                    (Confirmar Manualmente)
                                 </button>
                             </div>
                         </div>

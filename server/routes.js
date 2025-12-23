@@ -99,11 +99,11 @@ router.post('/webhooks/cakto', async (req, res) => {
                     selectedBumps.push('love');
                 }
 
-                if (bodyStr.includes('protecao') || bodyStr.includes('proteção') || bodyStr.includes('blindagem') || bodyStr.includes('escudo') || bodyStr.includes('ritual') || bodyStr.includes('blindagem espiritual')) {
+                if (bodyStr.includes('protecao') || bodyStr.includes('proteção') || bodyStr.includes('blindagem') || bodyStr.includes('escudo') || bodyStr.includes('ritual') || bodyStr.includes('blindagem espiritual') || bodyStr.includes('w4s82ha')) {
                     selectedBumps.push('protection');
                 }
 
-                if (bodyStr.includes('mapa') || bodyStr.includes('astral') || bodyStr.includes('astrologico') || bodyStr.includes('natal') || bodyStr.includes('mapa astral completo')) {
+                if (bodyStr.includes('mapa') || bodyStr.includes('astral') || bodyStr.includes('astrologico') || bodyStr.includes('natal') || bodyStr.includes('mapa astral completo') || bodyStr.includes('d8ci7v9')) {
                     selectedBumps.push('horoscope');
                 }
 
