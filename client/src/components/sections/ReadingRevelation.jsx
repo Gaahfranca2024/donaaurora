@@ -386,10 +386,8 @@ As cartas indicam uma inveja velada vinda de alguém próximo ao seu círculo de
                     </motion.div>
                 )}
             </div>
-        </motion.div>
-    )
-}
-        </div >
+        </div>
     );
 };
+
 export default ReadingRevelation;
