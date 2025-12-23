@@ -32,6 +32,20 @@ const ReadingFlow = ({ userData, onUpdate, onSubmit }) => {
                 </div>
 
                 <div className="space-y-2">
+                    <label className="text-amber-300 font-serif ml-2 block">Seu Melhor E-mail</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={userData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-white/90 border border-nebula rounded-xl px-4 py-3 text-black placeholder-gray-500 focus:border-amethyst outline-none transition-colors"
+                        placeholder="seu@email.com"
+                    />
+                    <p className="text-[10px] text-mist/60 ml-2 italic">Usado apenas para identificar sua leitura e enviar o acesso.</p>
+                </div>
+
+                <div className="space-y-2">
                     <label className="text-amber-300 font-serif ml-2 block">Data de Nascimento</label>
                     <input
                         type="date"

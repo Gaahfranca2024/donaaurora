@@ -5,6 +5,7 @@ const ReadingContext = createContext();
 export const ReadingProvider = ({ children }) => {
     const [userData, setUserData] = useState({
         name: '',
+        email: '',
         birthDate: '',
         question: ''
     });
