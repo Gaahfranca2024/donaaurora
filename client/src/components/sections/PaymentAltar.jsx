@@ -157,8 +157,10 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
                                     </button>
 
                                     {loadingPayment && (
-                                        <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10 text-xs text-indigo-200 animate-pulse">
-                                            Pague na aba que abriu e aguarde aqui a confirmação...
+                                        <div className="mt-4 p-6 bg-indigo-500/10 rounded-xl border border-indigo-500/30 text-sm text-indigo-300 animate-pulse flex flex-col items-center gap-3">
+                                            <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                                            <p className="font-medium">O oráculo está aguardando a confirmação do seu ritual...</p>
+                                            <p className="text-[10px] opacity-70">Não feche esta página. A revelação aparecerá assim que o pagamento for aprovado.</p>
                                         </div>
                                     )}
 
@@ -168,13 +170,6 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
                                     <p className="text-[10px] text-mist/60 mt-4 leading-relaxed max-w-[280px] mx-auto italic">
                                         Ao clicar, você será levado para o checkout seguro da Cakto.
                                     </p>
-
-                                    {/* Debug Sim - Mudar para algo mais discreto ou remover se for produção pura */}
-                                    {loadingPayment && (
-                                        <button onClick={onPaymentComplete} className="mt-8 text-[10px] text-white/10 hover:text-white/30">
-                                            (Simular Aprovação Interna)
-                                        </button>
-                                    )}
                                 </div>
                             )}
 

@@ -17,7 +17,6 @@ router.post('/payment', async (req, res) => {
 router.get('/payment/status/:email', async (req, res) => {
     try {
         const { email } = req.params;
-        const { data, error } = await saveLead({ email }); // This is a bit hacky, let's look at Supabase
 
         // Actually, we should query Supabase for a lead with this email that is 'paid'
         const { data: lead, error: dbError } = await require('./services/supabase').supabase
@@ -45,8 +44,8 @@ router.post('/webhooks/cakto', async (req, res) => {
     try {
         const { event, data } = req.body;
 
-        // Simplified Kakto logic - usually based on 'payment.paid'
-        if (event === 'payment.paid' || req.body.status === 'paid') {
+        // Corrected events for Kakto (using 'purchase_approved' as seen in logs)
+        if (event === 'purchase_approved' || event === 'payment.paid' || data?.status === 'paid' || req.body.status === 'paid') {
             const email = data?.customer?.email || req.body.customer_email;
 
             if (email) {
