@@ -7,6 +7,8 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 
 // ... existing routes
 
+console.log("🚀 [SERVER VERSION: 2.1.2-FIXED-QUEUE]");
+
 // --- LEAD REGISTRATION ---
 router.post('/leads', async (req, res) => {
     try {
