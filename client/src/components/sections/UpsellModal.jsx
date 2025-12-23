@@ -13,7 +13,8 @@ const UpsellModal = ({ isOpen, onClose, onPurchaseSuccess, userData }) => {
         if (paymentData?.id && viewState === 'payment') {
             interval = setInterval(async () => {
                 try {
-                    const res = await fetch(`http://localhost:3000/api/payment/${paymentData.id}`);
+                    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                    const res = await fetch(`${API_URL}/api/payment/${paymentData.id}`);
                     const data = await res.json();
                     if (data.status === 'approved') {
                         clearInterval(interval);
@@ -29,7 +30,8 @@ const UpsellModal = ({ isOpen, onClose, onPurchaseSuccess, userData }) => {
     const handleBuyClick = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:3000/api/payment', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            const res = await fetch(`${API_URL}/api/payment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
