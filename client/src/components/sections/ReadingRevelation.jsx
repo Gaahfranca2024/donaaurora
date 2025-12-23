@@ -23,24 +23,37 @@ const ReadingRevelation = ({ readingData = {}, deck = [], userData = {} }) => {
         });
     };
 
-    const handlePurchaseSuccess = async () => {
-        // Handle success
+    const handlePurchaseSuccess = () => {
         setIsUpsellOpen(false);
-        setExtraReading(`
-## 🛡️ RITUAL DE PROTEÇÃO & BLINDAGEM
 
-**A Fonte do Bloqueio:**
-As cartas indicam uma inveja velada vinda de alguém próximo ao seu círculo de convivência. Essa energia densa tenta minar sua autoconfiança e bloquear sua prosperidade.
+        // Dynamic extraction from AI text
+        const fullText = readingData.reading || "";
+        const lines = fullText.split('\n');
+        let ritualContent = [];
+        let capturing = false;
 
-**Oração de Quebra (Faça hoje à noite):**
-*"Eu sou luz, eu sou força. Nenhuma sombra penetra meu campo. O que não é meu, retorna à origem. Estou blindado(a) pelo manto estelar."*
+        lines.forEach(line => {
+            const lower = line.toLowerCase();
+            if (lower.includes('proteção') || lower.includes('blindagem') || lower.includes('🛡️')) {
+                capturing = true;
+                return;
+            }
+            if (capturing) {
+                // Stop at next header
+                if (line.trim().startsWith('#') || (line.trim().startsWith('**') && line.trim().length < 50)) {
+                    capturing = false;
+                    return;
+                }
+                ritualContent.push(line);
+            }
+        });
 
-**O Ritual Prático:**
-1. Escreva o que você deseja proteger em um papel branco.
-2. Coloque um copo com água e sal grosso ao lado do papel.
-3. Reze a oração acima em voz alta 3 vezes.
-4. Queime o papel com cuidado e jogue as cinzas na terra (ou vaso), devolvendo a energia para transmutação.
-`);
+        if (ritualContent.length > 0) {
+            setExtraReading(ritualContent.join('\n'));
+        } else {
+            // Fallback if not found in AI text
+            setExtraReading("Ritual de Blindagem ativado! Use este tempo para se conectar com sua essência e repelir negatividades.");
+        }
     };
 
     const handleDownloadPDF = () => {
@@ -233,8 +246,8 @@ As cartas indicam uma inveja velada vinda de alguém próximo ao seu círculo de
                                 const { title: titleLine, content: contentLines } = section;
                                 const lowerTitle = titleLine.toLowerCase();
 
-                                // Filter out internal AI instructions
-                                if (lowerTitle.includes("upsell") || lowerTitle.includes("instrução") || lowerTitle.includes("bloqueio")) return null;
+                                // Filter out internal AI instructions and the Protective Ritual (which goes to the upsell area)
+                                if (lowerTitle.includes("upsell") || lowerTitle.includes("instrução") || lowerTitle.includes("proteção") || lowerTitle.includes("blindagem") || lowerTitle.includes("bloqueio")) return null;
 
                                 // Icon logic
                                 let icon = "🔮";

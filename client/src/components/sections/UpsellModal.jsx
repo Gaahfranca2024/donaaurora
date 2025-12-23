@@ -10,48 +10,43 @@ const UpsellModal = ({ isOpen, onClose, onPurchaseSuccess, userData }) => {
     // Poll for payment status
     useEffect(() => {
         let interval;
-        if (paymentData?.id && viewState === 'payment') {
+        if (userData.email && viewState === 'payment') {
             interval = setInterval(async () => {
                 try {
                     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                    const res = await fetch(`${API_URL}/api/payment/${paymentData.id}`);
+                    // We poll the status by email to see if 'protection' appears in selected_bumps
+                    const res = await fetch(`${API_URL}/api/payment/status/${userData.email}`);
                     const data = await res.json();
-                    if (data.status === 'approved') {
+
+                    // The backend should return the full lead or at least the status/bumps
+                    // Let's assume the status endpoint could be improved or we use a more direct one
+                    // Actually, let's check if we can get the bumps from the status
+
+                    if (data.status === 'paid' && data.bumps?.includes('protection')) {
                         clearInterval(interval);
                         setViewState('success');
-                        setTimeout(() => onPurchaseSuccess(), 2000); // Wait a bit then trigger success action
+                        setTimeout(() => onPurchaseSuccess(), 2000);
                     }
-                } catch (e) { console.error(e); }
-            }, 3000);
+                } catch (e) { console.error("Upsell polling error", e); }
+            }, 5000);
         }
         return () => clearInterval(interval);
-    }, [paymentData, viewState, onPurchaseSuccess]);
+    }, [userData.email, viewState, onPurchaseSuccess, paymentData]);
 
-    const handleBuyClick = async () => {
+    const handleBuyClick = () => {
         setLoading(true);
-        try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            const res = await fetch(`${API_URL}/api/payment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: userData.name,
-                    email: 'upsell@cliente.com',
-                    amountOverride: 9.90, // Protection Ritual Price
-                    description: 'Ritual de Proteção - Mystic Tarot'
-                })
-            });
-            const data = await res.json();
-            if (data.qr_code_base64) {
-                setPaymentData(data);
-                setViewState('payment');
-            }
-        } catch (e) {
-            console.error(e);
-            alert('Erro ao gerar oferta. Tente novamente.');
-        } finally {
-            setLoading(false);
-        }
+        // Link para o checkout de Proteção da Kakto (R$ 9,90)
+        // O usuário deve trocar 'LINK_AQUI' pelo link real no painel da Kakto
+        const email = encodeURIComponent(userData.email || '');
+        const name = encodeURIComponent(userData.name || '');
+        const checkoutUrl = `https://pay.cakto.com.br/LINK_AQUI?email=${email}&name=${name}`;
+
+        console.log("🚀 Abrindo checkout de UPSSELL (Proteção):", checkoutUrl);
+        window.open(checkoutUrl, '_blank');
+
+        // Move to payment view to show polling
+        setViewState('payment');
+        setLoading(false);
     };
 
     const copyPix = () => {

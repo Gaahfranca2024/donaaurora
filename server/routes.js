@@ -7,7 +7,7 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 
 // ... existing routes
 
-console.log("🚀 [SERVER VERSION: 2.1.5-FORCED-LOVE-ONLY]");
+console.log("🚀 [SERVER VERSION: 2.1.6-PROTECTION-BUMP]");
 
 // --- LEAD REGISTRATION ---
 router.post('/leads', async (req, res) => {
@@ -43,7 +43,10 @@ router.get('/payment/status/:email', async (req, res) => {
             return res.json({ status: 'pending' });
         }
 
-        res.json({ status: lead.status });
+        res.json({
+            status: lead.status,
+            bumps: lead.selected_bumps || []
+        });
     } catch (error) {
         res.status(500).json({ status: 'error' });
     }
@@ -94,6 +97,10 @@ router.post('/webhooks/cakto', async (req, res) => {
 
                 if (isLove) {
                     selectedBumps.push('love');
+                }
+
+                if (bodyStr.includes('protecao') || bodyStr.includes('proteção') || bodyStr.includes('blindagem') || bodyStr.includes('escudo') || bodyStr.includes('ritual')) {
+                    selectedBumps.push('protection');
                 }
 
                 console.log(`📦 Bumps detected in this event: ${selectedBumps.join(', ')}`);
