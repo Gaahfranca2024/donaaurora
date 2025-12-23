@@ -1,0 +1,24 @@
+# Root .gitignore for Mystic Tarot
+
+# Node dependencies
+node_modules/
+
+# Environment variables (CRITICAL: Never upload these)
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+client/dist/
+
+# Debug files
+server/debug_horoscope_output.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

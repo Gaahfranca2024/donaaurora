@@ -1,0 +1,158 @@
+const express = require('express');
+const router = express.Router();
+const { getDraw } = require('./services/tarot');
+const { generateReading } = require('./services/ai');
+const { saveLead } = require('./services/supabase');
+const { createPixPayment, checkPaymentStatus } = require('./services/payment');
+
+// ... existing routes
+
+// --- PAYMENT ROUTES ---
+
+router.post('/payment', async (req, res) => {
+    try {
+        const { name, email, selectedBumps } = req.body;
+
+        // Calculate dynamic price
+        let amount = 5.00;
+
+        if (req.body.amountOverride) {
+            amount = Number(req.body.amountOverride);
+        } else if (selectedBumps) {
+            const bumps = [
+                { id: 'love', price: 9.90 }, // Bump Amor
+                { id: 'extra_cards', price: 5.00 } // Bump Cartas Extras
+            ];
+            selectedBumps.forEach(bumpId => {
+                const bump = bumps.find(b => b.id === bumpId);
+                if (bump) amount += bump.price;
+            });
+        }
+
+        const paymentData = await createPixPayment({
+            name,
+            email,
+            amount,
+            description: `Leitura Mystic Tarot - ${name}`
+        });
+
+        if (!paymentData) {
+            return res.status(500).json({ error: 'Failed to create payment' });
+        }
+
+        res.json(paymentData);
+
+    } catch (error) {
+        console.error("CRITICAL ERROR IN /api/payment:", error);
+        console.error(error.stack);
+        res.status(500).json({ error: error.message || 'Erro ao gerar PIX' });
+    }
+});
+
+router.get('/payment/:id', async (req, res) => {
+    try {
+        const status = await checkPaymentStatus(req.params.id);
+        res.json({ status });
+    } catch (error) {
+        res.status(500).json({ error: 'Error checking status' });
+    }
+});
+
+router.post('/webhook', async (req, res) => {
+    const { type, data } = req.body;
+    console.log("🔔 WEBHOOK RECEIVED:", type, data?.id);
+
+    try {
+        if (type === 'payment') {
+            const status = await checkPaymentStatus(data.id);
+            console.log(`💰 Payment ${data.id} is now: ${status}`);
+
+            // Here you would update your order in database
+            // await updateOrderStatus(data.id, status);
+        }
+        res.sendStatus(200);
+    } catch (error) {
+        console.error("Webhook Error:", error);
+        res.sendStatus(500);
+    }
+});
+
+// --- READING ROUTES ---
+
+const { generateHoroscope } = require('./services/horoscope');
+
+// ... existing routes ...
+
+// --- HOROSCOPE ROUTE (Offline Upsell) ---
+router.post('/horoscope', async (req, res) => {
+    console.log("HIT /api/horoscope with body:", req.body);
+    try {
+        const { birthDate } = req.body;
+        if (!birthDate) return res.status(400).json({ error: 'Data de nascimento obrigatória' });
+
+        console.log("Calling generateHoroscope...");
+        const horoscopeText = await generateHoroscope(birthDate, req.body.birthTime, req.body.city);
+        console.log("generateHoroscope RETURNED:", horoscopeText ? Object.keys(horoscopeText) : "NULL");
+
+        // DEBUG: Log the output to a file
+        try {
+            require('fs').writeFileSync('debug_horoscope_output.json', JSON.stringify(horoscopeText, null, 2));
+            console.log("DEBUG: Horoscope output saved to debug_horoscope_output.json");
+        } catch (err) {
+            console.error("DEBUG: Failed to save log file", err);
+        }
+
+        res.json(horoscopeText);
+
+    } catch (error) {
+        console.error("Horoscope error:", error);
+
+        // DEBUG: Capture error to file
+        try {
+            require('fs').writeFileSync('error_log.txt', `Date: ${new Date().toISOString()}\nError: ${error.message}\nStack: ${error.stack}`);
+        } catch (e) { console.error("Log failed", e); }
+
+        res.status(500).json({ error: 'Erro interno ao gerar horóscopo' });
+    }
+});
+
+// --- READING ROUTES ---
+
+router.post('/readings', async (req, res) => {
+    try {
+        const { name, birthDate, question, selectedBumps } = req.body;
+
+        if (!name || !question) {
+            return res.status(400).json({ error: 'Name and Question are required.' });
+        }
+
+        // 0. Save Lead
+        // Fire & Forget to not slow down response excessively, or await if safety is priority.
+        // Given earlier context, awaiting is safer for now.
+        try {
+            await saveLead({ name, birthDate, question, selectedBumps });
+        } catch (err) {
+            console.error('Lead save error:', err);
+        }
+
+        // 1. Fetch Tarot Cards
+        // Default 3, but if extra_cards bought, draw 5
+        const cardCount = selectedBumps && selectedBumps.includes('extra_cards') ? 5 : 3;
+        const cards = await getDraw(cardCount);
+
+        // 2. Generate AI Reading
+        const reading = await generateReading({ name, birthDate, question, selectedBumps }, cards);
+
+        // 3. Return Result
+        res.json({
+            cards,
+            reading
+        });
+
+    } catch (error) {
+        console.error('Error in /readings endpoint:', error);
+        res.status(500).json({ error: 'Failed to generate reading.' });
+    }
+});
+
+module.exports = router;
