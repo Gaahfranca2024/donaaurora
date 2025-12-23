@@ -7,7 +7,7 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 
 // ... existing routes
 
-console.log("🚀 [SERVER VERSION: 2.1.3-ULTRA-ROBUST]");
+console.log("🚀 [SERVER VERSION: 2.1.5-FORCED-LOVE-ONLY]");
 
 // --- LEAD REGISTRATION ---
 router.post('/leads', async (req, res) => {

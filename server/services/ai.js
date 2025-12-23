@@ -23,8 +23,8 @@ const generateReading = async (userData, cards) => {
     const activeBumps = userData.selected_bumps || userData.selectedBumps || [];
     console.log(`🤖 AI Reading requested. Bumps: ${JSON.stringify(activeBumps)}`);
 
-    // Check if "love" or "extra_cards" is present in ANY form (string or array item)
-    const hasLove = JSON.stringify(activeBumps).toLowerCase().includes('love');
+    // Force always delivering the Love experience, but keep extra cards as a bump
+    const hasLove = true;
     const hasExtra = cards.length >= 5 || JSON.stringify(activeBumps).toLowerCase().includes('extra');
 
     const sectionsPrompt = `
