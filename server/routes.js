@@ -7,7 +7,7 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 
 // ... existing routes
 
-console.log("🚀 [SERVER VERSION: 2.1.6-PROTECTION-BUMP]");
+console.log("🚀 [SERVER VERSION: 2.1.7-ALL-UPSELLS-CONFIGURED]");
 
 // --- LEAD REGISTRATION ---
 router.post('/leads', async (req, res) => {
@@ -101,6 +101,10 @@ router.post('/webhooks/cakto', async (req, res) => {
 
                 if (bodyStr.includes('protecao') || bodyStr.includes('proteção') || bodyStr.includes('blindagem') || bodyStr.includes('escudo') || bodyStr.includes('ritual')) {
                     selectedBumps.push('protection');
+                }
+
+                if (bodyStr.includes('mapa') || bodyStr.includes('astral') || bodyStr.includes('astrologico') || bodyStr.includes('natal')) {
+                    selectedBumps.push('horoscope');
                 }
 
                 console.log(`📦 Bumps detected in this event: ${selectedBumps.join(', ')}`);

@@ -82,9 +82,9 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
             interval = setInterval(async () => {
                 try {
                     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                    const res = await fetch(`${API_URL}/api/payment/${paymentData.id}`);
+                    const res = await fetch(`${API_URL}/api/payment/status/${paymentData.id}`);
                     const data = await res.json();
-                    if (data.status === 'approved') {
+                    if (data.status === 'paid' && data.bumps?.includes('horoscope')) {
                         handleGatePaymentSuccess();
                         clearInterval(interval);
                     }
@@ -96,32 +96,17 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
         return () => clearInterval(interval);
     }, [paymentData, isPremiumUnlocked, isOpen]);
 
-    const handleGeneratePix = async () => {
-        setPixLoading(true);
-        try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            const res = await fetch(`${API_URL}/api/payment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: userData?.name || "Cliente Mystic",
-                    email: "cliente@mystictarot.com.br", // Placeholder as we don't capture email yet
-                    amountOverride: 19.90, // Force price
-                    description: `Mapa Astral - ${userData?.name}`
-                })
-            });
-            const data = await res.json();
-            if (data.qr_code) {
-                setPaymentData(data);
-            } else {
-                alert("Erro ao gerar PIX. Tente novamente.");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Erro de conexão com o banco estelar.");
-        } finally {
-            setPixLoading(false);
-        }
+    const handleGeneratePix = () => {
+        // Link para o checkout de Mapa Astral da Kakto (R$ 19,90)
+        const email = encodeURIComponent(userData?.email || '');
+        const name = encodeURIComponent(userData?.name || '');
+        const checkoutUrl = `https://pay.cakto.com.br/d8ci7v9_697663?email=${email}&name=${name}`;
+
+        console.log("🚀 Abrindo checkout de MAPA ASTRAL:", checkoutUrl);
+        window.open(checkoutUrl, '_blank');
+
+        // Setup polling using email
+        setPaymentData({ id: userData?.email, isKakto: true });
     };
 
     // ... handleGenerateMap ...

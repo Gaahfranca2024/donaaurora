@@ -39,7 +39,7 @@ const UpsellModal = ({ isOpen, onClose, onPurchaseSuccess, userData }) => {
         // O usuário deve trocar 'LINK_AQUI' pelo link real no painel da Kakto
         const email = encodeURIComponent(userData.email || '');
         const name = encodeURIComponent(userData.name || '');
-        const checkoutUrl = `https://pay.cakto.com.br/LINK_AQUI?email=${email}&name=${name}`;
+        const checkoutUrl = `https://pay.cakto.com.br/w4s82ha_697659?email=${email}&name=${name}`;
 
         console.log("🚀 Abrindo checkout de UPSSELL (Proteção):", checkoutUrl);
         window.open(checkoutUrl, '_blank');
