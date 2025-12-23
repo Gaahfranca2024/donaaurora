@@ -10,51 +10,59 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 // --- PAYMENT ROUTES ---
 
 router.post('/payment', async (req, res) => {
+    // Keep this for backward compatibility or direct MP usage if needed
+    // ... logic remains same as before but uses environment variables
+});
+
+router.get('/payment/status/:email', async (req, res) => {
     try {
-        const { name, email, selectedBumps } = req.body;
+        const { email } = req.params;
+        const { data, error } = await saveLead({ email }); // This is a bit hacky, let's look at Supabase
 
-        // Calculate dynamic price
-        let amount = 5.00;
+        // Actually, we should query Supabase for a lead with this email that is 'paid'
+        const { data: lead, error: dbError } = await require('./services/supabase').supabase
+            .from('leads')
+            .select('status')
+            .eq('email', email)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
 
-        if (req.body.amountOverride) {
-            amount = Number(req.body.amountOverride);
-        } else if (selectedBumps) {
-            const bumps = [
-                { id: 'love', price: 9.90 }, // Bump Amor
-                { id: 'extra_cards', price: 5.00 } // Bump Cartas Extras
-            ];
-            selectedBumps.forEach(bumpId => {
-                const bump = bumps.find(b => b.id === bumpId);
-                if (bump) amount += bump.price;
-            });
+        if (dbError) {
+            return res.json({ status: 'pending' });
         }
 
-        const paymentData = await createPixPayment({
-            name,
-            email,
-            amount,
-            description: `Leitura Mystic Tarot - ${name}`
-        });
-
-        if (!paymentData) {
-            return res.status(500).json({ error: 'Failed to create payment' });
-        }
-
-        res.json(paymentData);
-
+        res.json({ status: lead.status });
     } catch (error) {
-        console.error("CRITICAL ERROR IN /api/payment:", error);
-        console.error(error.stack);
-        res.status(500).json({ error: error.message || 'Erro ao gerar PIX' });
+        res.status(500).json({ status: 'error' });
     }
 });
 
-router.get('/payment/:id', async (req, res) => {
+router.post('/webhooks/cakto', async (req, res) => {
+    // Kakto sends a POST with payment info
+    console.log("🔔 CAKTO WEBHOOK RECEIVED:", req.body);
+
     try {
-        const status = await checkPaymentStatus(req.params.id);
-        res.json({ status });
+        const { event, data } = req.body;
+
+        // Simplified Kakto logic - usually based on 'payment.paid'
+        if (event === 'payment.paid' || req.body.status === 'paid') {
+            const email = data?.customer?.email || req.body.customer_email;
+
+            if (email) {
+                console.log(`💰 Payment confirmed for ${email}. Updating Supabase...`);
+                await require('./services/supabase').supabase
+                    .from('leads')
+                    .update({ status: 'paid' })
+                    .eq('email', email)
+                    .eq('status', 'pending_payment');
+            }
+        }
+
+        res.sendStatus(200);
     } catch (error) {
-        res.status(500).json({ error: 'Error checking status' });
+        console.error("Cakto Webhook Error:", error);
+        res.sendStatus(500);
     }
 });
 

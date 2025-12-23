@@ -21,6 +21,7 @@ const saveLead = async (userData) => {
             .upsert([
                 {
                     name: userData.name,
+                    email: userData.email,
                     birth_date: userData.birthDate,
                     question: userData.question,
                     status: 'pending_payment', // pending_payment, paid, completed

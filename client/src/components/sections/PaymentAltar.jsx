@@ -28,50 +28,32 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
-    // ... (poll effect)
+    // POLLING PAYMENT STATUS via Supabase/API
     useEffect(() => {
         let interval;
-        if (paymentData?.id) {
+        if (loadingPayment) { // If user clicked the button, start checking
             interval = setInterval(async () => {
                 try {
                     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                    const res = await fetch(`${API_URL}/api/payment/${paymentData.id}`);
+                    // We poll by email to see if Kakto sent the webhook
+                    const res = await fetch(`${API_URL}/api/payment/status/${userData.email || 'cliente@teste.com'}`);
                     const data = await res.json();
-                    if (data.status === 'approved') {
+                    if (data.status === 'paid' || data.status === 'approved') {
                         clearInterval(interval);
-                        onPaymentComplete(); // Proceed to reading
+                        onPaymentComplete();
                     }
                 } catch (e) {
                     console.error("Polling error", e);
                 }
-            }, 3000);
+            }, 6000); // Polling every 6s for Kakto
         }
         return () => clearInterval(interval);
-    }, [paymentData, onPaymentComplete]);
+    }, [loadingPayment, userData.email, onPaymentComplete]);
 
-    const handleCreatePayment = async () => {
+    const handleCreatePayment = () => {
         setLoadingPayment(true);
-        try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            const res = await fetch(`${API_URL}/api/payment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: userData.name,
-                    email: 'cliente@teste.com', // In a real app we would ask for this
-                    selectedBumps
-                })
-            });
-            const data = await res.json();
-            if (data.qr_code_base64) {
-                setPaymentData(data);
-            }
-        } catch (e) {
-            console.error("Payment create error", e);
-            alert("Erro ao gerar Pix. Tente novamente.");
-        } finally {
-            setLoadingPayment(false);
-        }
+        // Abrir link da Cakto em nova aba
+        window.open('https://pay.cakto.com.br/rkysko4_697498', '_blank');
     };
 
     const copyToClipboard = () => {
@@ -161,57 +143,38 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
                                 {paymentData && <p className="text-amber-300 text-xs animate-pulse">Aguardando pagamento...</p>}
                             </div>
 
-                            {/* Área do QR Code ou Botão Inicial */}
-                            {!paymentData ? (
+                            {/* Área do Botão Kakto */}
+                            {!paymentData && (
                                 <div className="mt-8 text-center w-full">
                                     <button
                                         onClick={handleCreatePayment}
-                                        disabled={loadingPayment}
-                                        className="group relative w-full py-4 text-lg font-serif rounded-xl overflow-hidden shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50"
+                                        className="group relative w-full py-4 text-lg font-serif rounded-xl overflow-hidden shadow-lg hover:scale-[1.02] transition-transform"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-90 group-hover:opacity-100 transition-opacity" />
                                         <span className="relative flex items-center justify-center gap-2 text-white font-bold">
-                                            {loadingPayment ? 'Gerando Oferenda...' : <span>Gerar Pix de R$ {totalPrice.toFixed(2).replace('.', ',')}</span>}
-                                            {!loadingPayment && <span>⚡</span>}
+                                            {loadingPayment ? 'Aguardando Pagamento...' : 'Pagar e Ver Revelação ⚡'}
                                         </span>
                                     </button>
+
+                                    {loadingPayment && (
+                                        <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10 text-xs text-indigo-200 animate-pulse">
+                                            Pague na aba que abriu e aguarde aqui a confirmação...
+                                        </div>
+                                    )}
+
                                     <p className="text-mist mt-3 text-xs w-full text-center">
-                                        Ambiente seguro 🔒
+                                        Ambiente seguro 🔒 (Processado por Cakto)
                                     </p>
                                     <p className="text-[10px] text-mist/60 mt-4 leading-relaxed max-w-[280px] mx-auto italic">
-                                        Ao clicar, você declara ser maior de 18 anos e concorda que esta leitura (processada por IA) tem caráter espiritual e de entretenimento.
+                                        Ao clicar, você será levado para o checkout seguro da Cakto.
                                     </p>
-                                </div>
-                            ) : (
-                                <div className="animate-in fade-in zoom-in duration-500">
-                                    {/* QR CODE REAL */}
-                                    <div className="relative mx-auto w-48 h-48 bg-white p-2 rounded-lg flex items-center justify-center overflow-hidden mb-4">
-                                        <img
-                                            src={`data:image/png;base64,${paymentData.qr_code_base64}`}
-                                            alt="Pix QR Code"
-                                            className="w-full h-full object-contain"
-                                        />
-                                    </div>
 
-                                    {/* Copia e Cola */}
-                                    <div className="bg-black/30 p-3 rounded-lg border border-white/5 mb-4">
-                                        <p className="text-xs text-mist mb-2 break-all line-clamp-2 font-mono opacity-70">
-                                            {paymentData.qr_code}
-                                        </p>
-                                        <button
-                                            onClick={copyToClipboard}
-                                            className="text-gold text-sm font-bold hover:underline"
-                                        >
-                                            {copySuccess ? 'Copiado! ✅' : 'Copiar Código Pix 📋'}
+                                    {/* Debug Sim - Mudar para algo mais discreto ou remover se for produção pura */}
+                                    {loadingPayment && (
+                                        <button onClick={onPaymentComplete} className="mt-8 text-[10px] text-white/10 hover:text-white/30">
+                                            (Simular Aprovação Interna)
                                         </button>
-                                    </div>
-
-                                    {/* Botão de Mock (Simulação) para testar sem pagar de vdd se quiser */}
-                                    <div className="mt-2 text-centera">
-                                        <button onClick={onPaymentComplete} className="text-[10px] text-white/20 hover:text-white/50">
-                                            (Debug: Simular Aprovação)
-                                        </button>
-                                    </div>
+                                    )}
                                 </div>
                             )}
 
