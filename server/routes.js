@@ -61,14 +61,14 @@ router.post('/webhooks/cakto', async (req, res) => {
             if (email) {
                 console.log(`💰 Payment confirmed for ${email}. Detecting bumps...`);
 
-                // --- DETECT ORDER BUMPS BY NAME ---
+                // --- DETECT ORDER BUMPS BY NAME (MODO ROBUSTO) ---
                 const selectedBumps = [];
-                const bodyStr = JSON.stringify(req.body);
+                const bodyStr = JSON.stringify(req.body).toLowerCase();
 
-                if (bodyStr.includes('+ 2 cartas (LEITURA APROFUNDADA)')) {
+                if (bodyStr.includes('leitura aprofundada') || bodyStr.includes('2 cartas')) {
                     selectedBumps.push('extra_cards');
                 }
-                if (bodyStr.includes('Análise de Compatibilidade Amorosa')) {
+                if (bodyStr.includes('compatibilidade amorosa') || bodyStr.includes('analise de amor')) {
                     selectedBumps.push('love');
                 }
 
