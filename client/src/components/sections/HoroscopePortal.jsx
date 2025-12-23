@@ -81,7 +81,8 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
         if (paymentData && paymentData.id && !isPremiumUnlocked && isOpen) {
             interval = setInterval(async () => {
                 try {
-                    const res = await fetch(`http://127.0.0.1:3000/api/payment/${paymentData.id}`);
+                    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                    const res = await fetch(`${API_URL}/api/payment/${paymentData.id}`);
                     const data = await res.json();
                     if (data.status === 'approved') {
                         handleGatePaymentSuccess();
@@ -98,7 +99,8 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
     const handleGeneratePix = async () => {
         setPixLoading(true);
         try {
-            const res = await fetch('http://127.0.0.1:3000/api/payment', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            const res = await fetch(`${API_URL}/api/payment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -127,8 +129,8 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
     const handleGenerateMap = async () => {
         setStep('loading');
         try {
-            // Force IPv4 to avoid localhost issues
-            const res = await fetch('http://127.0.0.1:3000/api/horoscope', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            const res = await fetch(`${API_URL}/api/horoscope`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
