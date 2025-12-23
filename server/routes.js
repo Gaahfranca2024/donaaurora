@@ -7,7 +7,7 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 
 // ... existing routes
 
-console.log("🚀 [SERVER VERSION: 2.1.7-ALL-UPSELLS-CONFIGURED]");
+console.log("🚀 [SERVER VERSION: 2.1.8-EXACT-PRODUCT-NAMES]");
 
 // --- LEAD REGISTRATION ---
 router.post('/leads', async (req, res) => {
@@ -99,11 +99,11 @@ router.post('/webhooks/cakto', async (req, res) => {
                     selectedBumps.push('love');
                 }
 
-                if (bodyStr.includes('protecao') || bodyStr.includes('proteção') || bodyStr.includes('blindagem') || bodyStr.includes('escudo') || bodyStr.includes('ritual')) {
+                if (bodyStr.includes('protecao') || bodyStr.includes('proteção') || bodyStr.includes('blindagem') || bodyStr.includes('escudo') || bodyStr.includes('ritual') || bodyStr.includes('blindagem espiritual')) {
                     selectedBumps.push('protection');
                 }
 
-                if (bodyStr.includes('mapa') || bodyStr.includes('astral') || bodyStr.includes('astrologico') || bodyStr.includes('natal')) {
+                if (bodyStr.includes('mapa') || bodyStr.includes('astral') || bodyStr.includes('astrologico') || bodyStr.includes('natal') || bodyStr.includes('mapa astral completo')) {
                     selectedBumps.push('horoscope');
                 }
 
