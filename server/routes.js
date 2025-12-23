@@ -7,7 +7,7 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 
 // ... existing routes
 
-console.log("🚀 [SERVER VERSION: 2.1.2-FIXED-QUEUE]");
+console.log("🚀 [SERVER VERSION: 2.1.3-ULTRA-ROBUST]");
 
 // --- LEAD REGISTRATION ---
 router.post('/leads', async (req, res) => {
@@ -84,11 +84,22 @@ router.post('/webhooks/cakto', async (req, res) => {
                 if (bodyStr.includes('carta') || bodyStr.includes('extra') || bodyStr.includes('aprofundada')) {
                     selectedBumps.push('extra_cards');
                 }
-                if (bodyStr.includes('amor') || bodyStr.includes('compatibilidade') || bodyStr.includes('sinastria')) {
+                const isLove = bodyStr.includes('amor') ||
+                    bodyStr.includes('compatibilidade') ||
+                    bodyStr.includes('sinastria') ||
+                    bodyStr.includes('alma') ||
+                    bodyStr.includes('gemea') ||
+                    bodyStr.includes('gêmea') ||
+                    bodyStr.includes('analise');
+
+                if (isLove) {
                     selectedBumps.push('love');
                 }
 
-                console.log(`📦 Bumps detected: ${selectedBumps.join(', ')}`);
+                console.log(`📦 Bumps detected in this event: ${selectedBumps.join(', ')}`);
+                if (selectedBumps.length === 0) {
+                    console.log(`🔍 NO BUMPS detected. Body snapshot: ${bodyStr.substring(0, 300)}...`);
+                }
 
                 // 1. Get current lead to merge bumps
                 const { data: currentLead } = await require('./services/supabase').supabase
