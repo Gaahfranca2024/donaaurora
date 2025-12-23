@@ -7,6 +7,16 @@ const { createPixPayment, checkPaymentStatus } = require('./services/payment');
 
 // ... existing routes
 
+// --- LEAD REGISTRATION ---
+router.post('/leads', async (req, res) => {
+    try {
+        const lead = await saveLead(req.body);
+        res.json({ success: true, lead });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to save lead' });
+    }
+});
+
 // --- PAYMENT ROUTES ---
 
 router.post('/payment', async (req, res) => {
@@ -49,10 +59,27 @@ router.post('/webhooks/cakto', async (req, res) => {
             const email = data?.customer?.email || req.body.customer_email;
 
             if (email) {
-                console.log(`💰 Payment confirmed for ${email}. Updating Supabase...`);
+                console.log(`💰 Payment confirmed for ${email}. Detecting bumps...`);
+
+                // --- DETECT ORDER BUMPS BY NAME ---
+                const selectedBumps = [];
+                const bodyStr = JSON.stringify(req.body);
+
+                if (bodyStr.includes('+ 2 cartas (LEITURA APROFUNDADA)')) {
+                    selectedBumps.push('extra_cards');
+                }
+                if (bodyStr.includes('Análise de Compatibilidade Amorosa')) {
+                    selectedBumps.push('love');
+                }
+
+                console.log(`📦 Bumps detected: ${selectedBumps.join(', ')}`);
+
                 await require('./services/supabase').supabase
                     .from('leads')
-                    .update({ status: 'paid' })
+                    .update({
+                        status: 'paid',
+                        selected_bumps: selectedBumps
+                    })
                     .eq('email', email)
                     .eq('status', 'pending_payment');
             }
@@ -127,30 +154,35 @@ router.post('/horoscope', async (req, res) => {
 
 router.post('/readings', async (req, res) => {
     try {
-        const { name, birthDate, question, selectedBumps } = req.body;
+        const { email } = req.body;
 
-        if (!name || !question) {
-            return res.status(400).json({ error: 'Name and Question are required.' });
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required to retrieve reading.' });
         }
 
-        // 0. Save Lead
-        // Fire & Forget to not slow down response excessively, or await if safety is priority.
-        // Given earlier context, awaiting is safer for now.
-        try {
-            await saveLead({ name, birthDate, question, selectedBumps });
-        } catch (err) {
-            console.error('Lead save error:', err);
+        // 1. Fetch Lead from DB to get the LATEST status and bumps (confirmed by webhook)
+        const { data: lead, error: dbError } = await require('./services/supabase').supabase
+            .from('leads')
+            .select('*')
+            .eq('email', email)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (dbError || !lead) {
+            return res.status(404).json({ error: 'Lead not found.' });
         }
 
-        // 1. Fetch Tarot Cards
-        // Default 3, but if extra_cards bought, draw 5
-        const cardCount = selectedBumps && selectedBumps.includes('extra_cards') ? 5 : 3;
+        // 2. Fetch Tarot Cards
+        // Source of truth for bumps is now the database
+        const selectedBumps = lead.selected_bumps || [];
+        const cardCount = selectedBumps.includes('extra_cards') ? 5 : 3;
         const cards = await getDraw(cardCount);
 
-        // 2. Generate AI Reading
-        const reading = await generateReading({ name, birthDate, question, selectedBumps }, cards);
+        // 3. Generate AI Reading
+        const reading = await generateReading(lead, cards);
 
-        // 3. Return Result
+        // 4. Return Result
         res.json({
             cards,
             reading

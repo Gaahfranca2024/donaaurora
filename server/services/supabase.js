@@ -24,7 +24,8 @@ const saveLead = async (userData) => {
                     email: userData.email,
                     birth_date: userData.birthDate,
                     question: userData.question,
-                    status: 'pending_payment', // pending_payment, paid, completed
+                    selected_bumps: userData.selectedBumps || [],
+                    status: userData.status || 'pending_payment',
                     created_at: new Date()
                 }
             ], { onConflict: 'id' }) // Assuming we might have an ID later, or just insert

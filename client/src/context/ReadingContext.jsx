@@ -37,8 +37,18 @@ export const ReadingProvider = ({ children }) => {
         setUserData(prev => ({ ...prev, ...data }));
     };
 
-    const startPaymentFlow = () => {
+    const startPaymentFlow = async () => {
         setReadingState('payment_pending');
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            await fetch(`${API_URL}/api/leads`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...userData, selectedBumps, status: 'pending_payment' })
+            });
+        } catch (err) {
+            console.error("Failed to register lead", err);
+        }
     };
 
     const confirmPayment = async () => {
