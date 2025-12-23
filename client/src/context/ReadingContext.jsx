@@ -17,7 +17,7 @@ export const ReadingProvider = ({ children }) => {
     const basePrice = 5.00;
     const bumps = [
         { id: 'love', label: 'Análise de Compatibilidade Amorosa', price: 4.90 },
-        { id: 'extra_cards', label: '+ 2 Cartas (Leitura Aprofundada)', price: 2.50 }
+        { id: 'extra_cards', label: '+ 2 cartas (LEITURA APROFUNDADA)', price: 2.50 }
     ];
 
     const totalPrice = basePrice + selectedBumps.reduce((sum, bumpId) => {
