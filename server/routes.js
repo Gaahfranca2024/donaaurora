@@ -72,16 +72,28 @@ router.post('/webhooks/cakto', async (req, res) => {
                     selectedBumps.push('love');
                 }
 
-                console.log(`📦 Bumps detected: ${selectedBumps.join(', ')}`);
+                console.log(`📦 Bumps detected in this event: ${selectedBumps.join(', ')}`);
+
+                // 1. Get current lead to merge bumps
+                const { data: currentLead } = await require('./services/supabase').supabase
+                    .from('leads')
+                    .select('selected_bumps')
+                    .eq('email', email)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                const finalBumps = Array.from(new Set([...(currentLead?.selected_bumps || []), ...selectedBumps]));
 
                 await require('./services/supabase').supabase
                     .from('leads')
                     .update({
                         status: 'paid',
-                        selected_bumps: selectedBumps
+                        selected_bumps: finalBumps
                     })
-                    .eq('email', email)
-                    .eq('status', 'pending_payment');
+                    .eq('email', email); // Remove status check so late bumps work
+
+                console.log(`✅ Supabase updated for ${email}. Final bumps: ${finalBumps.join(', ')}`);
             }
         }
 
