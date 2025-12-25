@@ -3,8 +3,31 @@ import { motion } from 'framer-motion';
 
 const ReadingFlow = ({ userData, onUpdate, onSubmit }) => {
 
+    const [displayDate, setDisplayDate] = useState('');
+
     const handleChange = (e) => {
         onUpdate({ ...userData, [e.target.name]: e.target.value });
+    };
+
+    const handleDateInput = (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 8) value = value.slice(0, 8);
+
+        let formatted = value;
+        if (value.length > 4) {
+            formatted = `${value.slice(0, 2)}/${value.slice(2, 4)}/${value.slice(4)}`;
+        } else if (value.length > 2) {
+            formatted = `${value.slice(0, 2)}/${value.slice(2)}`;
+        }
+
+        setDisplayDate(formatted);
+
+        if (value.length === 8) {
+            const day = value.slice(0, 2);
+            const month = value.slice(2, 4);
+            const year = value.slice(4);
+            onUpdate({ ...userData, birthDate: `${year}-${month}-${day}` });
+        }
     };
 
     return (
@@ -47,14 +70,21 @@ const ReadingFlow = ({ userData, onUpdate, onSubmit }) => {
 
                 <div className="space-y-2">
                     <label className="text-amber-300 font-serif ml-2 block">Data de Nascimento</label>
-                    <input
-                        type="date"
-                        name="birthDate"
-                        value={userData.birthDate}
-                        onChange={handleChange}
-                        required
-                        className="w-full bg-white/90 border border-nebula rounded-xl px-4 py-3 text-black placeholder-gray-500 focus:border-amethyst outline-none transition-colors"
-                    />
+                    <div className="relative">
+                        <input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="DD/MM/AAAA"
+                            value={displayDate}
+                            onChange={handleDateInput}
+                            required
+                            className="w-full bg-white/90 border border-nebula rounded-xl px-4 py-3 text-black placeholder-gray-400 focus:border-amethyst outline-none transition-colors"
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                            📅
+                        </div>
+                    </div>
+                    <p className="text-[10px] text-mist/60 ml-2 italic">Digite apenas os números do seu nascimento.</p>
                 </div>
 
                 <div className="space-y-2">
