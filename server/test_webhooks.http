@@ -1,0 +1,36 @@
+@baseUrl = https://seu-app-no-render.onrender.com
+# @baseUrl = http://localhost:3000
+
+### Simular Webhook Kakto - Compra Aprovada
+POST {{baseUrl}}/api/webhooks/cakto
+Content-Type: application/json
+
+{
+    "event": "purchase_approved",
+    "data": {
+        "customer": {
+            "email": "teste@exemplo.com"
+        },
+        "product": {
+            "name": "Leitura de Tarot"
+        },
+        "status": "paid"
+    }
+}
+
+### Simular Webhook Kakto - Mapa Astral (Upsell)
+POST {{baseUrl}}/api/webhooks/cakto
+Content-Type: application/json
+
+{
+    "event": "purchase_approved",
+    "data": {
+        "customer": {
+            "email": "teste@exemplo.com"
+        },
+        "product": {
+            "name": "Mapa Astral Completo"
+        },
+        "status": "paid"
+    }
+}

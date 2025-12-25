@@ -173,6 +173,17 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
                                     <p className="text-mist mt-3 text-xs w-full text-center">
                                         Ambiente seguro 🔒 (Processado por Cakto)
                                     </p>
+
+                                    {/* --- DEBUG MODE --- */}
+                                    <div className="mt-8 pt-4 border-t border-white/5">
+                                        <button
+                                            onClick={onPaymentComplete}
+                                            className="text-[10px] text-mist/30 hover:text-mist/80 transition-colors uppercase tracking-widest font-bold"
+                                        >
+                                            ⚡ Módulo Debug: Simular Aprovação
+                                        </button>
+                                    </div>
+
                                     <p className="text-[10px] text-mist/60 mt-4 leading-relaxed max-w-[280px] mx-auto italic">
                                         Ao clicar, você será levado para o checkout seguro da Cakto.
                                     </p>
