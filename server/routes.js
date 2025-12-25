@@ -28,26 +28,33 @@ router.post('/payment', async (req, res) => {
 
 router.get('/payment/status/:email', async (req, res) => {
     try {
-        const { email } = req.params;
+        const { email: rawEmail } = req.params;
+        const email = rawEmail.trim().toLowerCase();
 
-        // Actually, we should query Supabase for a lead with this email that is 'paid'
+        console.log(`🔍 Polling status for: ${email}`);
+
+        // We MUST select both status and selected_bumps for the frontend to work
         const { data: lead, error: dbError } = await require('./services/supabase').supabase
             .from('leads')
-            .select('status')
+            .select('status, selected_bumps')
             .eq('email', email)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
 
-        if (dbError) {
-            return res.json({ status: 'pending' });
+        if (dbError || !lead) {
+            console.log(`⚠️ Status check: Lead not found or error for ${email}`);
+            return res.json({ status: 'pending', bumps: [] });
         }
+
+        console.log(`✅ Status check for ${email}: ${lead.status}. Bumps: ${JSON.stringify(lead.selected_bumps || [])}`);
 
         res.json({
             status: lead.status,
             bumps: lead.selected_bumps || []
         });
     } catch (error) {
+        console.error("Status check error:", error);
         res.status(500).json({ status: 'error' });
     }
 });
