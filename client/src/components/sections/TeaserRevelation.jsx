@@ -78,7 +78,7 @@ const TeaserRevelation = ({ userData, onUnlock }) => {
                         </span>
                     </button>
                     <p className="mt-4 text-sm text-gray-400">
-                        ⚡ Oferta por tempo limitado: Apenas <span className="text-green-400 font-bold">R$ 5,00</span>
+                        ⚡ Oferta por tempo limitado: Apenas <span className="text-green-400 font-bold">R$ 9,90</span>
                     </p>
                 </div>
             </div>

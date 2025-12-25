@@ -89,40 +89,40 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
 
                 {/* Lado Esquerdo: Order Bumps - NOW ORDER 1 ON MOBILE */}
                 <div className="space-y-6 order-1 lg:order-1">
-                    <div className="bg-twilight/40 backdrop-blur-md rounded-2xl border border-white/10 p-6">
-                        <h3 className="text-xl font-serif text-amber-200 mb-4 flex items-center gap-2">
-                            <span>💎</span> Profundidade Extra
-                        </h3>
-                        <p className="text-sm text-mist mb-6">
-                            Aproveite a conexão aberta agora para revelar detalhes que normalmente custariam o triplo.
-                        </p>
+                    <div className="bg-twilight/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 shadow-xl relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amethyst to-transparent"></div>
 
-                        <div className="space-y-4">
-                            {bumps.map(bump => (
-                                <div
-                                    key={bump.id}
-                                    onClick={() => !paymentData && toggleBump(bump.id)} // Disable toggle if payment created
-                                    className={`relative cursor-pointer group p-4 rounded-xl border-2 transition-all duration-300 
-                                        ${selectedBumps.includes(bump.id) ? 'bg-amethyst/20 border-amethyst shadow-[0_0_15px_rgba(157,78,221,0.3)]' : 'bg-black/20 border-white/5 hover:border-white/20'}
-                                        ${paymentData ? 'opacity-50 cursor-not-allowed' : ''}
-                                    `}
-                                >
-                                    <div className="flex items-start gap-4">
-                                        <div className={`w-6 h-6 rounded border-2 flex items-center justify-center mt-1 transition-colors ${selectedBumps.includes(bump.id) ? 'bg-amethyst border-amethyst' : 'border-mist/50'}`}>
-                                            {selectedBumps.includes(bump.id) && <span className="text-white text-xs">✓</span>}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-center mb-1">
-                                                <h4 className={`font-bold ${selectedBumps.includes(bump.id) ? 'text-white' : 'text-gray-300'}`}>{bump.label}</h4>
-                                                <span className="text-green-400 font-bold text-sm">+ R$ {bump.price.toFixed(2).replace('.', ',')}</span>
-                                            </div>
-                                            <p className="text-xs text-gray-400">
-                                                {bump.id === 'love' ? 'Descubra se ele(a) é sua alma gêmea ou lição cármica.' : 'Interpretação expandida com 5 arcanos para visão total.'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                        <h3 className="text-2xl font-serif text-amber-200 mb-6 flex items-center gap-3">
+                            <span className="text-3xl">📝</span> Passo a Passo
+                        </h3>
+
+                        <div className="space-y-6">
+                            <div className="flex gap-4">
+                                <div className="w-8 h-8 rounded-full bg-amethyst/20 border border-amethyst/40 flex flex-shrink-0 items-center justify-center text-sm font-bold text-amethyst">1</div>
+                                <p className="text-gray-300 text-sm leading-relaxed">
+                                    Após clicar no botão abaixo, você será levado para o checkout seguro da <span className="text-white font-bold">Cakto</span> para realizar sua oferenda.
+                                </p>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <div className="w-8 h-8 rounded-full bg-amethyst/20 border border-amethyst/40 flex flex-shrink-0 items-center justify-center text-sm font-bold text-amethyst">2</div>
+                                <p className="text-gray-300 text-sm leading-relaxed italic">
+                                    <span className="text-white font-bold">IMPORTANTE:</span> Após concluir a compra na aba da Cakto, <span className="text-white font-bold">volte para esta página</span> imediatamente.
+                                </p>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <div className="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/30 flex flex-shrink-0 items-center justify-center text-sm font-bold text-red-400">3</div>
+                                <p className="text-gray-300 text-sm leading-relaxed">
+                                    <span className="text-red-400 font-bold">NÃO FECHE esta aba.</span> Aguarde aqui enquanto processamos sua revelação. O conteúdo carregará automaticamente assim que o pagamento for aprovado.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 p-4 bg-indigo-500/5 rounded-xl border border-indigo-500/10 text-center">
+                            <p className="text-indigo-300/60 text-[11px] uppercase tracking-widest font-bold">
+                                Fique aqui para receber seu entregável
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -174,15 +174,6 @@ const PaymentAltar = ({ userData, onPaymentComplete }) => {
                                         Ambiente seguro 🔒 (Processado por Cakto)
                                     </p>
 
-                                    {/* --- DEBUG MODE --- */}
-                                    <div className="mt-8 pt-4 border-t border-white/5">
-                                        <button
-                                            onClick={onPaymentComplete}
-                                            className="text-[10px] text-mist/30 hover:text-mist/80 transition-colors uppercase tracking-widest font-bold"
-                                        >
-                                            ⚡ Módulo Debug: Simular Aprovação
-                                        </button>
-                                    </div>
 
                                     <p className="text-[10px] text-mist/60 mt-4 leading-relaxed max-w-[280px] mx-auto italic">
                                         Ao clicar, você será levado para o checkout seguro da Cakto.

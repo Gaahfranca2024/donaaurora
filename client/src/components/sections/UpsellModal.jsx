@@ -160,11 +160,11 @@ const UpsellModal = ({ isOpen, onClose, onPurchaseSuccess, userData }) => {
                                 </button>
                             </div>
 
-                            {/* Debug Sim */}
-                            <div className="mt-8 text-center opacity-20 hover:opacity-100 transition-opacity">
-                                <button onClick={() => { setViewState('success'); setTimeout(() => onPurchaseSuccess(), 1000); }} className="text-[10px] text-white/50">
-                                    (Confirmar Manualmente)
-                                </button>
+                            <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10 text-[10px] text-mist/60 leading-relaxed italic">
+                                <p className="mb-2"><strong>PASSO A PASSO:</strong></p>
+                                <p>1. Complete a compra na aba que foi aberta.</p>
+                                <p>2. <span className="text-amber-200 font-bold">Volte para esta página</span> e NÃO a feche.</p>
+                                <p>3. Aguarde o processamento automático do seu ritual.</p>
                             </div>
                         </div>
                     )}

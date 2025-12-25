@@ -14,7 +14,7 @@ export const ReadingProvider = ({ children }) => {
     const [readingText, setReadingText] = useState('');
     const [selectedBumps, setSelectedBumps] = useState([]);
 
-    const basePrice = 5.00;
+    const basePrice = 9.90;
     const bumps = [
         { id: 'love', label: 'Análise de Compatibilidade Amorosa', price: 4.90 },
         { id: 'extra_cards', label: '+ 2 cartas (LEITURA APROFUNDADA)', price: 2.50 }
