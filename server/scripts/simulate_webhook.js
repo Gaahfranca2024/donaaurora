@@ -6,8 +6,8 @@ const axios = require('axios');
  * Exemplo: node scripts/simulate_webhook.js teste@email.com "Mapa Astral"
  */
 
-const email = process.argv[2] || 'test@example.com';
-const productName = process.argv[3] || 'Leitura de Tarot';
+const email = process.argv[2] || 'teste@exemplo.com';
+const productName = process.argv[3] || 'blindagem espiritual';
 const baseUrl = process.env.API_URL || 'http://localhost:3000';
 
 const payload = {

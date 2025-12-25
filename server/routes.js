@@ -74,42 +74,51 @@ router.post('/webhooks/cakto', async (req, res) => {
     webhookQueue.set(email, webhookQueue.get(email).then(async () => {
         try {
             console.log(`🔔 PROCESSING WEBHOOK for ${email} (${event})`);
+            console.log("FULL PAYLOAD SNAPSHOT:", JSON.stringify(req.body).substring(0, 1000));
 
             // Corrected events for Kakto
-            if (event === 'purchase_approved' || event === 'payment.paid' || data?.status === 'paid' || req.body.status === 'paid') {
-                const productName = data?.product?.name || data?.offer?.name || "";
-                console.log(`💰 Payment confirmed. Product: "${productName}"`);
+            const isPaid = event === 'purchase_approved' || event === 'payment.paid' || data?.status === 'paid' || req.body.status === 'paid' || data?.status === 'approved';
+
+            if (isPaid) {
+                const productName = data?.product?.name || data?.offer?.name || req.body.product_name || "";
+                console.log(`💰 Payment confirmed. Main Product: "${productName}"`);
 
                 // --- DETECT ORDER BUMPS BY KEYWORD ---
                 const selectedBumps = [];
-                const bodyStr = JSON.stringify(req.body).toLowerCase();
 
-                if (bodyStr.includes('carta') || bodyStr.includes('extra') || bodyStr.includes('aprofundada')) {
+                // Deep scan: check main product, all items, and the whole body
+                const bodyStr = JSON.stringify(req.body).toLowerCase();
+                const items = data?.items || req.body.items || [];
+                const itemNames = Array.isArray(items) ? items.map(i => (i.name || i.product_name || "").toLowerCase()) : [];
+
+                const searchString = (bodyStr + " " + itemNames.join(" ")).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                if (searchString.includes('carta') || searchString.includes('extra') || searchString.includes('aprofundada')) {
                     selectedBumps.push('extra_cards');
                 }
-                const isLove = bodyStr.includes('amor') ||
-                    bodyStr.includes('compatibilidade') ||
-                    bodyStr.includes('sinastria') ||
-                    bodyStr.includes('alma') ||
-                    bodyStr.includes('gemea') ||
-                    bodyStr.includes('gêmea') ||
-                    bodyStr.includes('analise');
+
+                const isLove = searchString.includes('amor') ||
+                    searchString.includes('compatibilidade') ||
+                    searchString.includes('sinastria') ||
+                    searchString.includes('alma') ||
+                    searchString.includes('gemea') ||
+                    searchString.includes('analise');
 
                 if (isLove) {
                     selectedBumps.push('love');
                 }
 
-                if (bodyStr.includes('protecao') || bodyStr.includes('proteção') || bodyStr.includes('blindagem') || bodyStr.includes('escudo') || bodyStr.includes('ritual') || bodyStr.includes('blindagem espiritual') || bodyStr.includes('w4s82ha')) {
+                if (searchString.includes('protecao') || searchString.includes('blindagem') || searchString.includes('escudo') || searchString.includes('ritual') || searchString.includes('w4s82ha')) {
                     selectedBumps.push('protection');
                 }
 
-                if (bodyStr.includes('mapa') || bodyStr.includes('astral') || bodyStr.includes('astrologico') || bodyStr.includes('natal') || bodyStr.includes('mapa astral completo') || bodyStr.includes('d8ci7v9')) {
+                if (searchString.includes('mapa') || searchString.includes('astral') || searchString.includes('astrologico') || searchString.includes('natal') || searchString.includes('d8ci7v9')) {
                     selectedBumps.push('horoscope');
                 }
 
-                console.log(`📦 Bumps detected in this event: ${selectedBumps.join(', ')}`);
+                console.log(`📦 Bumps detected after scan: ${selectedBumps.join(', ')}`);
                 if (selectedBumps.length === 0) {
-                    console.log(`🔍 NO BUMPS detected. Body snapshot: ${bodyStr.substring(0, 300)}...`);
+                    console.log(`🔍 NO BUMPS detected. Search string excerpt: ${searchString.substring(0, 200)}...`);
                 }
 
                 // 1. Get current lead to merge bumps
