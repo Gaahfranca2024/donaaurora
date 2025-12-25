@@ -14,8 +14,9 @@ const UpsellModal = ({ isOpen, onClose, onPurchaseSuccess, userData }) => {
             interval = setInterval(async () => {
                 try {
                     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                    const email = userData.email.trim().toLowerCase();
                     // We poll the status by email to see if 'protection' appears in selected_bumps
-                    const res = await fetch(`${API_URL}/api/payment/status/${userData.email}`);
+                    const res = await fetch(`${API_URL}/api/payment/status/${encodeURIComponent(email)}`);
                     const data = await res.json();
 
                     // The backend should return the full lead or at least the status/bumps

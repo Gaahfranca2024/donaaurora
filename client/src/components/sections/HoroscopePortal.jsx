@@ -82,7 +82,8 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
             interval = setInterval(async () => {
                 try {
                     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                    const res = await fetch(`${API_URL}/api/payment/status/${paymentData.id}`);
+                    const email = paymentData.id.trim().toLowerCase();
+                    const res = await fetch(`${API_URL}/api/payment/status/${encodeURIComponent(email)}`);
                     const data = await res.json();
                     if (data.status === 'paid' && data.bumps?.includes('horoscope')) {
                         handleGatePaymentSuccess();

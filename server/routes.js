@@ -81,22 +81,26 @@ router.post('/webhooks/cakto', async (req, res) => {
 
             if (isPaid) {
                 const productName = data?.product?.name || data?.offer?.name || req.body.product_name || "";
-                console.log(`💰 Payment confirmed. Main Product: "${productName}"`);
+                const offerId = data?.offer?.id || req.body.offer_id || "";
+                console.log(`💰 Payment confirmed. Main Product: "${productName}" (ID: ${offerId})`);
 
                 // --- DETECT ORDER BUMPS BY KEYWORD ---
                 const selectedBumps = [];
 
-                // Deep scan: check main product, all items, and the whole body
-                const bodyStr = JSON.stringify(req.body).toLowerCase();
+                // Deep scan: check main product and all items (NOT the whole body to avoid false positives)
                 const items = data?.items || req.body.items || [];
-                const itemNames = Array.isArray(items) ? items.map(i => (i.name || i.product_name || "").toLowerCase()) : [];
+                const itemNames = Array.isArray(items) ? items.map(i => (i.name || i.product_name || i.title || "").toLowerCase()) : [];
+                const allProductNames = [productName.toLowerCase(), ...itemNames];
 
-                const searchString = (bodyStr + " " + itemNames.join(" ")).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                // Normalizing for keyword search
+                const searchString = allProductNames.join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+                // 1. Extra Cards (Search only in product names)
                 if (searchString.includes('carta') || searchString.includes('extra') || searchString.includes('aprofundada')) {
                     selectedBumps.push('extra_cards');
                 }
 
+                // 2. Love (Search only in product names)
                 const isLove = searchString.includes('amor') ||
                     searchString.includes('compatibilidade') ||
                     searchString.includes('sinastria') ||
@@ -108,11 +112,13 @@ router.post('/webhooks/cakto', async (req, res) => {
                     selectedBumps.push('love');
                 }
 
-                if (searchString.includes('protecao') || searchString.includes('blindagem') || searchString.includes('escudo') || searchString.includes('ritual') || searchString.includes('w4s82ha')) {
+                // 3. Protection (Specific ID OR keyword)
+                if (offerId === 'w4s82ha' || searchString.includes('protecao') || searchString.includes('blindagem')) {
                     selectedBumps.push('protection');
                 }
 
-                if (searchString.includes('mapa') || searchString.includes('astral') || searchString.includes('astrologico') || searchString.includes('natal') || searchString.includes('d8ci7v9')) {
+                // 4. Horoscope (Specific ID OR keyword)
+                if (offerId === 'd8ci7v9' || searchString.includes('mapa') || searchString.includes('astral')) {
                     selectedBumps.push('horoscope');
                 }
 
