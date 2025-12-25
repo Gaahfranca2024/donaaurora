@@ -152,59 +152,113 @@ const HoroscopePortal = ({ isOpen, onClose, userData, onPaymentSuccess }) => {
     };
 
     const handleDownloadPDF = async () => {
-        if (!reportRef.current) return;
+        if (!horoscopeText) return;
 
-        // Clone element
-        const element = reportRef.current;
-        const clone = element.cloneNode(true);
+        // Create a hidden container for the PDF content
+        const element = document.createElement('div');
+        element.style.padding = '40px';
+        element.style.fontFamily = "'Georgia', serif";
+        element.style.color = '#0b0a1d';
+        element.style.background = '#ffffff';
+        element.style.width = '800px';
 
-        // Prep clone for capture - VISIBLE OVERLAY STRATEGY (z-9999 sometimes fails)
-        clone.style.position = 'absolute';
-        clone.style.top = '0';
-        clone.style.left = '0';
-        clone.style.width = '1000px';
-        clone.style.height = 'auto'; // Allow full expansion
-        clone.style.minHeight = '100vh';
-        clone.style.overflow = 'visible';
-        clone.style.zIndex = '9999'; // Force TOP visibility for capture
+        // Helper to clean AI text for the PDF
+        const cleanBody = (data) => {
+            if (!data) return "";
+            const extract = (d) => {
+                if (typeof d === 'string') return [d];
+                if (typeof d === 'object' && d !== null) {
+                    return Object.values(d).flatMap(val => extract(val));
+                }
+                return [];
+            };
+            const strings = extract(data);
+            return strings.join('\n\n').replace(/[{}[\]]/g, '').trim();
+        };
 
-        // VISUAL STYLES for PDF
-        clone.style.backgroundColor = '#0b0a1d'; // Dark background
-        clone.style.color = '#ffffff'; // Ensure base text is white
-        clone.style.padding = '40px';
+        let htmlContent = `
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="font-size: 32px; color: #1e1b3c; margin-bottom: 8px;">Mapa Astral: ${userData.name || 'Viajante'}</h1>
+                <p style="color: #6366f1; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; font-size: 14px;">
+                    ${formData.city} &bull; ${formData.birthDate} &bull; ${formData.birthTime}
+                </p>
+                <div style="height: 2px; background: linear-gradient(to right, transparent, #6366f1, transparent); margin: 25px 0;"></div>
+            </div>
 
-        // Remove scroll classes
-        clone.classList.remove('overflow-y-auto', 'h-full', 'custom-scrollbar');
+            <div style="margin-bottom: 40px;">
+                <h2 style="color: #4338ca; font-size: 24px; border-bottom: 1px solid #e0e7ff; padding-bottom: 8px; margin-bottom: 20px;">🪐 Posicionamentos Planetários</h2>
+                <table style="width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px;">
+                    <thead>
+                        <tr style="background: #f8fafc; text-align: left;">
+                            <th style="padding: 12px; border: 1px solid #e2e8f0; color: #475569;">Corpo Celeste</th>
+                            <th style="padding: 12px; border: 1px solid #e2e8f0; color: #475569;">Signo e Grau</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
 
-        document.body.appendChild(clone);
+        Object.entries(horoscopeText.data.planets).forEach(([name, info]) => {
+            const deg = Math.floor(info.lon % 30);
+            const min = Math.floor((info.lon % 1) * 60);
+            const sign = ZODIAC_SIGNS[Math.floor(info.lon / 30)]?.name || '?';
+            htmlContent += `
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; font-weight: bold; color: #1e293b; text-transform: capitalize;">${name}</td>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; color: #334155;">${deg}° ${min}' ${sign} ${info.isRetrograde ? '<span style="color: #ef4444; font-size: 10px; margin-left: 5px;">(Retrogrado)</span>' : ''}</td>
+                </tr>
+            `;
+        });
 
-        // Wait for rendering
-        await new Promise(resolve => setTimeout(resolve, 800));
+        htmlContent += `
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="page-break-before: always; padding-top: 20px;">
+                <h2 style="color: #4338ca; font-size: 24px; border-bottom: 1px solid #e0e7ff; padding-bottom: 8px; margin-bottom: 30px;">🌌 Interpretação do Oráculo</h2>
+        `;
+
+        sections.forEach(section => {
+            const sectionText = cleanBody(section.text);
+            if (sectionText) {
+                htmlContent += `
+                    <div style="margin-bottom: 40px; page-break-inside: avoid;">
+                        <h3 style="color: #1e1b3c; margin-bottom: 12px; font-size: 20px; display: flex; align-items: center;">
+                            <span style="margin-right: 10px;">✨</span> ${section.title}
+                        </h3>
+                        <div style="line-height: 1.8; color: #334155; text-align: justify; font-size: 16px; white-space: pre-wrap;">
+                            ${sectionText}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        htmlContent += `
+            <div style="margin-top: 60px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; pt-20">
+                <p>Gerado por Mystic Tarot &bull; O Destino está escrito nas estrelas.</p>
+            </div>
+        </div>`;
+
+        element.innerHTML = htmlContent;
 
         const opt = {
-            margin: [10, 10, 20, 10],
-            filename: `Mapa-Astral-${formData.name || 'Destino'}.pdf`,
+            margin: [15, 15, 20, 15],
+            filename: `Mapa-Astral-${userData.name || 'Destino'}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
                 scale: 2,
                 useCORS: true,
-                scrollY: 0,
-                x: 0,
-                y: 0,
-                windowWidth: 1000,
-                backgroundColor: '#0b0a1d',
-                logging: false
+                letterRendering: true
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         try {
-            await html2pdf().set(opt).from(clone).save();
+            await html2pdf().set(opt).from(element).save();
         } catch (err) {
             console.error("PDF Export failed:", err);
-        } finally {
-            document.body.removeChild(clone);
         }
     };
 
