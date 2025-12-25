@@ -5,6 +5,7 @@ import html2pdf from 'html2pdf.js';
 
 import UpsellModal from './UpsellModal';
 import HoroscopePortal from './HoroscopePortal';
+import { PROTECTION_RITUAL } from '../../constants/rituals';
 
 const ReadingRevelation = ({ readingData = {}, deck = [], userData = {} }) => {
     // readingData should contain: { reading: "string", cards: [] }
@@ -25,35 +26,7 @@ const ReadingRevelation = ({ readingData = {}, deck = [], userData = {} }) => {
 
     const handlePurchaseSuccess = () => {
         setIsUpsellOpen(false);
-
-        // Dynamic extraction from AI text
-        const fullText = readingData.reading || "";
-        const lines = fullText.split('\n');
-        let ritualContent = [];
-        let capturing = false;
-
-        lines.forEach(line => {
-            const lower = line.toLowerCase();
-            if (lower.includes('proteção') || lower.includes('blindagem') || lower.includes('🛡️')) {
-                capturing = true;
-                return;
-            }
-            if (capturing) {
-                // Stop at next header
-                if (line.trim().startsWith('#') || (line.trim().startsWith('**') && line.trim().length < 50)) {
-                    capturing = false;
-                    return;
-                }
-                ritualContent.push(line);
-            }
-        });
-
-        if (ritualContent.length > 0) {
-            setExtraReading(ritualContent.join('\n'));
-        } else {
-            // Fallback if not found in AI text
-            setExtraReading("Ritual de Blindagem ativado! Use este tempo para se conectar com sua essência e repelir negatividades.");
-        }
+        setExtraReading(PROTECTION_RITUAL);
     };
 
     const handleDownloadPDF = () => {

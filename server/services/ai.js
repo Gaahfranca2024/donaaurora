@@ -55,8 +55,6 @@ const generateReading = async (userData, cards) => {
       ## 🕯️ Ritual Sugerido
       (Passo a passo detalhado de um ritual mágico prático.)
 
-      ## 🛡️ Ritual de Proteção e Blindagem
-      (Um ritual de alta magia para selar a aura contra ataques psíquicos, inveja e drenos energéticos. Seja extremamente detalhado e use uma linguagem poderosa.)
 
       ## ❤️ Alma Gêmea & Sinastria
       (Análise profunda da vida amorosa, conexões de vidas passadas e futuro romântico. Dê esperança mas seja realista.)
