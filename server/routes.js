@@ -197,7 +197,7 @@ router.post('/horoscope', async (req, res) => {
         if (!birthDate) return res.status(400).json({ error: 'Data de nascimento obrigatória' });
 
         console.log("Calling generateHoroscope...");
-        const horoscopeText = await generateHoroscope(birthDate, req.body.birthTime, req.body.city);
+        const horoscopeText = await generateHoroscope(req.body.name, birthDate, req.body.birthTime, req.body.city);
         console.log("generateHoroscope RETURNED:", horoscopeText ? Object.keys(horoscopeText) : "NULL");
 
         // DEBUG: Log the output to a file

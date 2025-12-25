@@ -93,7 +93,7 @@ const calculateAscendant = (date, lat, lon) => {
     return (asc % 360 + 360) % 360;
 };
 
-const generateHoroscope = async (birthDateStr, birthTimeStr = "12:00", city = "") => {
+const generateHoroscope = async (name = "Buscador", birthDateStr, birthTimeStr = "12:00", city = "") => {
     try {
         // 1. Prepare Date
         const fullDateStr = `${birthDateStr}T${birthTimeStr}:00`;
@@ -194,7 +194,7 @@ const generateHoroscope = async (birthDateStr, birthTimeStr = "12:00", city = ""
         const sunSign = getZodiacFromLongitude(sunLon);
 
         // Call Dedicated AI for deep analysis
-        const aiPrediction = await generateAstralAnalysis("User", {
+        const aiPrediction = await generateAstralAnalysis(name, {
             planets: planetsData,
             ascendant: ascendantDegree,
             aspects: aspects
