@@ -155,6 +155,25 @@ router.post('/webhooks/cakto', async (req, res) => {
                     .eq('email', email);
 
                 console.log(`✅ Supabase updated for ${email}. Final bumps: ${finalBumps.join(', ')}`);
+
+                // --- SEND EMAIL NOTIFICATION ---
+                try {
+                    const { sendReadingEmail } = require('./services/email');
+                    // Get name from DB if possible, or fallback
+                    const customerName = currentLead?.name || "Viajante";
+                    // Use origin from request or fallback to production URL
+                    const origin = req.get('origin') || 'https://mystic-tarot.onrender.com';
+                    // Construct a direct recovery link (or just the main site, handled by recovery flow)
+                    // For now, sending them to the main site is safest, telling them to click "Recuperar" or just Login if we had auth.
+                    // Actually, if we link to https://site.com/?email=... we could auto-load.
+                    // But simpler: Just link to site and tell them to use "Já fiz meu pedido" if it doesn't auto-load (cookies).
+                    // BETTER: We can add a query param ?recover_email=... that the frontend detects.
+                    const recoveryLink = `${origin}?recover_email=${encodeURIComponent(email)}`;
+
+                    await sendReadingEmail(email, customerName, recoveryLink);
+                } catch (emailErr) {
+                    console.error("⚠️ Failed to trigger email in webhook:", emailErr);
+                }
             }
         } catch (error) {
             console.error(`❌ Webhook individual error for ${email}:`, error);
